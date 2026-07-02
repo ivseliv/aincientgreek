@@ -241,6 +241,13 @@ details.ref[open] summary::before{content:"▾ "}
 .review-tag{color:var(--laurel)}
 .hom-badge{font-family:var(--greek); font-style:normal; color:var(--gold);
   border:1px solid var(--gold); border-radius:999px; padding:1px 9px; font-size:12.5px; white-space:nowrap}
+.auth-row{display:flex; gap:8px}
+.auth-input{flex:1; min-width:0; background:#17120d; border:1px solid var(--wood-dim); border-radius:4px;
+  color:var(--ivory); font-family:var(--serif); font-size:14px; padding:8px 10px}
+.auth-status{font-size:13px; color:var(--muted); margin-top:8px}
+.auth-status b{color:var(--laurel); font-weight:400}
+.sync-dot{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--muted); margin-right:5px}
+.sync-dot.on{background:var(--laurel)}
 .acc-form{margin-top:22px; display:flex; flex-wrap:wrap; gap:3px; align-items:baseline}
 .acc-char{font-family:var(--greek); font-size:clamp(30px,6vw,44px); color:var(--ivory);
   background:none; border:none; border-bottom:2px solid transparent; padding:0 2px; line-height:1.2;
@@ -321,6 +328,11 @@ button.acc-char.sel{border-bottom-color:var(--gold); color:var(--gold)}
     </div>
 
     <div class="panel">
+      <h2>Аккаунт</h2>
+      <div id="authArea"></div>
+    </div>
+
+    <div class="panel">
       <h2>Прогресс</h2>
       <div style="display:flex; gap:8px; flex-wrap:wrap">
         <button class="btn" id="expBtn" style="padding:7px 14px; font-size:13.5px">Выгрузить JSON</button>
@@ -370,6 +382,7 @@ button.acc-char.sel{border-bottom-color:var(--gold); color:var(--gold)}
   <div class="lv-sub" id="lvSub"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 "use strict";
 /* ══════════════ ДАННЫЕ ══════════════
@@ -1168,6 +1181,115 @@ const backend = {
     try{ localStorage.setItem(key, value); }catch(e){}
   }
 };
+/* ══════════════ SUPABASE: АККАУНТ И СИНХРОНИЗАЦИЯ ══════════════ */
+const SUPA_URL = "https://btcmvifhyqmnkhbjifsq.supabase.co";
+const SUPA_KEY = "sb_publishable_KbTVYd5AYzjrGcytn8sM-A_Nr_HY7To";
+const supa = (window.supabase && SUPA_URL)
+  ? window.supabase.createClient(SUPA_URL, SUPA_KEY) : null;
+
+S.user = null;
+S.syncing = false;
+
+function snapshotProgress(){
+  const {xp,best,right,total,review,byGroup,ach,cnt} = S;
+  return {xp,best,right,total,review,byGroup,ach,cnt};
+}
+function applyProgress(d){
+  if(!d) return;
+  ["xp","best","right","total"].forEach(k=>{ if(typeof d[k]==="number") S[k]=d[k]; });
+  if(Array.isArray(d.review)) S.review = d.review.slice(0,60);
+  if(d.byGroup && typeof d.byGroup==="object") S.byGroup = d.byGroup;
+  if(d.ach && typeof d.ach==="object") S.ach = d.ach;
+  if(d.cnt && typeof d.cnt==="object") Object.assign(S.cnt, d.cnt);
+}
+
+/* При первом входе — более "продвинутый" профиль (по XP) побеждает целиком,
+   чтобы не путать локальные и облачные данные полями. */
+async function pullRemote(){
+  if(!supa || !S.user) return;
+  const { data, error } = await supa.from("progress")
+    .select("data").eq("user_id", S.user.id).maybeSingle();
+  if(error){ renderAuth(); return; }
+  const remote = data && data.data;
+  const local = snapshotProgress();
+  if(remote && (remote.xp||0) > (local.xp||0)) applyProgress(remote);
+  await pushRemote();
+  renderStats(); renderAch(); renderAuth();
+}
+let pushTimer = null;
+async function pushRemote(){
+  if(!supa || !S.user) return;
+  clearTimeout(pushTimer);
+  return new Promise(res=>{
+    pushTimer = setTimeout(async ()=>{
+      S.syncing = true; renderAuth();
+      try{
+        await supa.from("progress").upsert({
+          user_id: S.user.id, data: snapshotProgress(), updated_at: new Date().toISOString()
+        });
+      }catch(e){}
+      S.syncing = false; renderAuth();
+      res();
+    }, 600);
+  });
+}
+
+async function initAuth(){
+  if(!supa){ renderAuth(); return; }
+  const { data:{ session } } = await supa.auth.getSession();
+  S.user = session ? session.user : null;
+  renderAuth();
+  if(S.user) await pullRemote();
+  supa.auth.onAuthStateChange(async (event, session)=>{
+    S.user = session ? session.user : null;
+    renderAuth();
+    if(S.user) await pullRemote();
+  });
+}
+
+async function sendMagicLink(email){
+  if(!supa || !email) return;
+  const box = $("authArea");
+  try{
+    await supa.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.href } });
+    box.querySelector(".auth-status").innerHTML = `Ссылка отправлена на <b>${email}</b> — проверьте почту.`;
+  }catch(e){
+    box.querySelector(".auth-status").textContent = "Не удалось отправить ссылку. Попробуйте ещё раз.";
+  }
+}
+async function signOut(){
+  if(!supa) return;
+  await supa.auth.signOut();
+  S.user = null;
+  renderAuth();
+}
+function renderAuth(){
+  const box = $("authArea");
+  if(!box) return;
+  if(!supa){
+    box.innerHTML = `<p class="hint">Синхронизация недоступна — прогресс хранится локально.</p>`;
+    return;
+  }
+  if(S.user){
+    box.innerHTML = `
+      <p class="auth-status"><span class="sync-dot ${S.syncing?"":"on"}"></span>
+        ${S.syncing ? "синхронизация…" : "синхронизировано"}<br>
+        <b>${S.user.email}</b></p>
+      <button class="btn" id="signOutBtn" style="margin-top:8px; padding:7px 14px; font-size:13.5px; width:100%">Выйти</button>`;
+    $("signOutBtn").addEventListener("click", signOut);
+  }else{
+    box.innerHTML = `
+      <div class="auth-row">
+        <input type="email" id="authEmail" class="auth-input" placeholder="you@mail.com" autocomplete="email">
+        <button class="btn" id="authSendBtn" style="padding:8px 14px; font-size:13.5px">Войти</button>
+      </div>
+      <p class="auth-status">Вход по ссылке на почту — без пароля. Прогресс синхронизируется между устройствами.</p>`;
+    const send = ()=>sendMagicLink($("authEmail").value.trim());
+    $("authSendBtn").addEventListener("click", send);
+    $("authEmail").addEventListener("keydown", e=>{ if(e.key==="Enter") send(); });
+  }
+}
+
 const store = {
   async load(){
     try{
@@ -1186,6 +1308,7 @@ const store = {
       await backend.set("gymnasion-progress",
         JSON.stringify({xp,best,right,total,review,byGroup,ach,cnt}));
     }catch(e){}
+    if(S.user) pushRemote();
   }
 };
 
@@ -1492,7 +1615,7 @@ function wireProgressIO(){
         if(d.byGroup && typeof d.byGroup==="object") S.byGroup = d.byGroup;
         if(d.ach && typeof d.ach==="object") S.ach = d.ach;
         if(d.cnt && typeof d.cnt==="object") Object.assign(S.cnt, d.cnt);
-        store.save(); renderStats();
+        store.save(); renderStats(); renderAch();
       }catch(err){ alert("Не удалось прочитать файл прогресса"); }
       e.target.value = "";
     });
@@ -2139,6 +2262,7 @@ function nounSlotsAll(){ return NOUN_SLOTS; }
   renderAch();
   renderSprintHint();
   newQuestion();
+  initAuth();  /* асинхронно: если есть сессия, подтянет и смержит облачный прогресс */
 })();
 </script>
 </body>
