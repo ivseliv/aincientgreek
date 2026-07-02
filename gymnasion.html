@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Γυμνάσιον — тренажёр древнегреческой морфологии</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=PT+Mono&family=GFS+Didot&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1b1712;
+  --wax:#262019;
+  --wax-hi:#2f2820;
+  --wood:#6e5335;
+  --wood-dim:#4a3a26;
+  --ivory:#eae0cc;
+  --muted:#9c8f78;
+  --gold:#d9a441;
+  --laurel:#8fa663;
+  --rubric:#c94f38;
+  --line:#3a3125;
+  --serif:"PT Serif", Georgia, serif;
+  --greek:"GFS Didot", "PT Serif", Georgia, serif;
+  --mono:"PT Mono", ui-monospace, monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);
+  background-image:radial-gradient(ellipse at 50% -20%, #2a231a 0%, var(--bg) 60%);
+  color:var(--ivory);
+  font-family:var(--serif);
+  min-height:100vh;
+  line-height:1.5;
+}
+a{color:var(--gold)}
+button{font-family:inherit; cursor:pointer}
+:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
+
+/* ── Шапка ─────────────────────────────── */
+header{
+  border-bottom:1px solid var(--line);
+  padding:20px clamp(16px,4vw,48px) 16px;
+  display:flex; flex-wrap:wrap; gap:14px 28px; align-items:baseline; justify-content:space-between;
+}
+.brand h1{
+  font-family:var(--greek);
+  font-weight:400;
+  font-size:clamp(26px,4vw,38px);
+  letter-spacing:.14em;
+}
+.brand h1 .accent{color:var(--gold)}
+.brand p{color:var(--muted); font-size:14px; font-style:italic; margin-top:2px}
+.stats{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.stat{
+  background:var(--wax); border:1px solid var(--line); border-radius:4px;
+  padding:6px 12px; font-family:var(--mono); font-size:13px; color:var(--muted);
+  display:flex; gap:8px; align-items:baseline; white-space:nowrap;
+}
+.stat b{color:var(--ivory); font-size:15px; font-weight:400}
+.stat.xp b{color:var(--gold)}
+.stat.streak b{color:var(--laurel)}
+.level-tag{
+  font-family:var(--greek); font-size:15px; color:var(--gold);
+  border:1px solid var(--gold); border-radius:999px; padding:4px 14px; letter-spacing:.06em;
+}
+.xpbar{height:3px; background:var(--line); border-radius:2px; overflow:hidden; width:100%; margin-top:10px}
+.xpbar i{display:block; height:100%; background:var(--gold); width:0%; transition:width .5s ease}
+
+/* ── Каркас ────────────────────────────── */
+main{
+  max-width:1160px; margin:0 auto; padding:26px clamp(14px,4vw,48px) 60px;
+  display:grid; grid-template-columns:300px 1fr; gap:28px; align-items:start;
+}
+@media (max-width:880px){ main{grid-template-columns:1fr} }
+
+/* ── Панель настроек ───────────────────── */
+aside{ display:flex; flex-direction:column; gap:18px }
+.panel{ background:var(--wax); border:1px solid var(--line); border-radius:6px; padding:16px }
+.panel h2{
+  font-size:12px; font-family:var(--mono); text-transform:uppercase; letter-spacing:.18em;
+  color:var(--muted); margin-bottom:12px; font-weight:400;
+}
+.tabs{display:flex; border:1px solid var(--wood-dim); border-radius:4px; overflow:hidden}
+.tabs button{flex:1; background:none; border:none; color:var(--muted); padding:8px 2px; font-size:13.5px}
+.tabs button.on{background:var(--wood-dim); color:var(--ivory)}
+.chips{display:flex; flex-wrap:wrap; gap:7px; margin-top:12px}
+.chip{
+  background:none; border:1px solid var(--line); color:var(--muted);
+  border-radius:999px; padding:5px 11px; font-size:13px; transition:all .15s;
+}
+.chip.on{border-color:var(--gold); color:var(--gold)}
+.modes{display:flex; flex-direction:column; gap:8px}
+.mode{
+  text-align:left; background:none; border:1px solid var(--line); border-radius:4px;
+  color:var(--muted); padding:9px 12px; font-size:14px;
+}
+.mode.on{border-color:var(--ivory); color:var(--ivory); background:var(--wax-hi)}
+.mode small{display:block; font-size:12px; color:var(--muted); margin-top:1px}
+.toggle{display:flex; align-items:flex-start; gap:10px; font-size:14px; color:var(--muted); cursor:pointer; user-select:none}
+.toggle + .toggle{margin-top:10px}
+.toggle input{accent-color:var(--gold); width:15px; height:15px; margin-top:4px; flex:none}
+.toggle b{color:var(--ivory); font-weight:400}
+.hint{font-size:12.5px; color:var(--muted); margin-top:10px; font-style:italic}
+
+/* ── Табличка (упражнение) ─────────────── */
+.tablet-frame{
+  border:6px solid var(--wood);
+  border-radius:10px;
+  box-shadow:0 0 0 1px #2a2015, 0 18px 40px -18px rgba(0,0,0,.8), inset 0 0 0 1px #1a1510;
+  background:linear-gradient(160deg, #29221a 0%, #221c15 55%, #262019 100%);
+  padding:clamp(20px,4vw,40px);
+  position:relative;
+}
+.tablet-frame::before{
+  content:""; position:absolute; inset:0; pointer-events:none; border-radius:4px;
+  background:radial-gradient(ellipse 80% 40% at 30% 0%, rgba(255,240,200,.05), transparent 70%);
+}
+.task-label{
+  font-family:var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:14px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+}
+.task-label .combo{color:var(--gold)}
+.lemma{font-family:var(--greek); font-size:clamp(28px,4.5vw,42px); line-height:1.15}
+.lemma .art{color:var(--muted); font-size:.7em}
+.gloss{color:var(--muted); font-style:italic; margin-top:2px; font-size:15px}
+.target{margin-top:18px; font-size:17px; color:var(--gold); font-family:var(--mono); letter-spacing:.04em}
+.form-shown{
+  font-family:var(--greek); font-size:clamp(34px,6vw,52px); margin-top:10px;
+  text-shadow:0 1px 0 rgba(0,0,0,.6), 0 -1px 0 rgba(255,240,200,.06);
+}
+
+/* поле ввода — вощёная строка */
+.answer-row{display:flex; gap:10px; margin-top:22px}
+.ginput{
+  background:#17120d;
+  border:1px solid var(--wood-dim); border-radius:4px;
+  color:var(--ivory); font-family:var(--greek);
+  text-shadow:0 1px 0 rgba(0,0,0,.7), 0 -1px 0 rgba(255,240,200,.07);
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.55);
+}
+#answer{flex:1; min-width:0; font-size:clamp(22px,4vw,30px); padding:10px 14px}
+#answer::placeholder{color:#514738; text-shadow:none; font-size:.75em}
+.ginput.cell-ok{border-color:var(--laurel)}
+.ginput.cell-bad{border-color:var(--rubric)}
+.btn{
+  background:var(--wood-dim); color:var(--ivory); border:1px solid var(--wood);
+  border-radius:4px; padding:10px 20px; font-size:15px;
+}
+.btn:hover{background:var(--wood)}
+.btn.primary{background:var(--gold); border-color:var(--gold); color:#241c0e; font-weight:700}
+.btn.primary:hover{filter:brightness(1.08)}
+
+/* экранная клавиатура */
+.kbd{margin-top:14px; display:flex; flex-direction:column; gap:6px}
+.kbd-row{display:flex; gap:6px; flex-wrap:wrap}
+.key{
+  background:var(--wax-hi); border:1px solid var(--line); border-radius:4px;
+  color:var(--ivory); font-family:var(--greek); font-size:18px;
+  min-width:36px; padding:6px 0 4px; flex:1; max-width:52px;
+}
+.key:hover{border-color:var(--gold)}
+.key.util{font-family:var(--mono); font-size:12px; color:var(--muted); max-width:none; flex:1.6}
+.key.dia{color:var(--gold); font-size:19px}
+.kbd-note{font-size:12px; color:var(--muted); margin-top:6px; font-style:italic}
+
+/* кнопки разбора */
+.parse-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:22px}
+.parse-grid.p3{grid-template-columns:repeat(3,1fr)}
+@media (max-width:560px){ .parse-grid, .parse-grid.p3{grid-template-columns:repeat(2,1fr)} }
+.parse-btn{
+  background:var(--wax-hi); border:1px solid var(--line); border-radius:4px;
+  color:var(--ivory); font-family:var(--mono); font-size:13px; padding:11px 4px;
+}
+.parse-btn:hover{border-color:var(--gold)}
+.parse-btn.good{border-color:var(--laurel); color:var(--laurel)}
+.parse-btn.bad{border-color:var(--rubric); color:var(--rubric)}
+.parse-btn:disabled{cursor:default; opacity:.85}
+.parse-btn.wide{grid-column:span 2}
+.parse-btn.gk{font-family:var(--greek); font-size:19px; padding:9px 4px}
+
+/* полная парадигма */
+.pgrid{display:grid; grid-template-columns:max-content 1fr; gap:8px 12px; margin-top:22px; align-items:center}
+.pgrid label{font-family:var(--mono); font-size:12px; color:var(--muted); white-space:nowrap; text-align:right}
+.pgrid .ginput{width:100%; font-size:20px; padding:7px 12px}
+.pgrid .cell-note{grid-column:2; font-family:var(--greek); font-size:16px; color:var(--rubric); margin-top:-4px}
+.pgrid-sep{grid-column:1 / -1; border:none; border-top:1px dotted var(--line); margin:4px 0}
+
+/* обратная связь */
+.feedback{margin-top:20px; min-height:58px}
+.verdict{font-size:17px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap}
+.verdict.ok{color:var(--laurel)}
+.verdict.err{color:var(--rubric)}
+.verdict.mixed{color:var(--gold)}
+.verdict .xp-gain{font-family:var(--mono); font-size:14px; color:var(--gold); animation:rise .8s ease}
+@keyframes rise{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+.correction{
+  margin-top:6px; font-family:var(--greek); font-size:24px; color:var(--rubric);
+  border-bottom:1px solid var(--rubric); display:inline-block; padding-bottom:2px;
+}
+.correction-note{font-size:13.5px; color:var(--muted); font-style:italic; margin-top:4px}
+.correction-note .g{font-family:var(--greek); font-style:normal; font-size:15px; color:var(--ivory)}
+.next-row{margin-top:16px}
+
+/* level-up */
+.levelup{
+  position:fixed; left:50%; top:18%; transform:translateX(-50%) scale(.9);
+  background:var(--wax); border:1px solid var(--gold); border-radius:8px;
+  padding:22px 38px; text-align:center; z-index:50; opacity:0; pointer-events:none;
+  transition:all .4s ease; box-shadow:0 20px 60px rgba(0,0,0,.7);
+}
+.levelup.show{opacity:1; transform:translateX(-50%) scale(1)}
+.levelup .lv-title{font-family:var(--greek); font-size:30px; color:var(--gold); letter-spacing:.08em}
+.levelup .lv-sub{color:var(--muted); font-size:14px; margin-top:4px}
+
+/* ── Справочник ────────────────────────── */
+details.ref{grid-column:1 / -1; background:var(--wax); border:1px solid var(--line); border-radius:6px}
+details.ref summary{
+  padding:14px 18px; cursor:pointer; font-family:var(--mono); font-size:13px;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--muted); list-style:none;
+}
+details.ref summary::before{content:"▸ "; color:var(--gold)}
+details.ref[open] summary::before{content:"▾ "}
+.ref-body{padding:6px 18px 22px; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px}
+.ref-table.wide3{grid-column:1 / -1; max-width:760px}
+.ref-table h3{font-family:var(--greek); font-weight:400; font-size:20px; color:var(--gold); margin-bottom:2px}
+.ref-table .rt-sub{font-size:12px; color:var(--muted); font-style:italic; margin-bottom:8px}
+.ref-table table{width:100%; border-collapse:collapse; font-size:14px}
+.ref-table td, .ref-table th{padding:3px 6px; border-bottom:1px dotted var(--line); text-align:left}
+.ref-table th{font-family:var(--mono); font-size:11px; color:var(--muted); font-weight:400; text-transform:uppercase; letter-spacing:.1em}
+.ref-table td:first-child{font-family:var(--mono); font-size:11.5px; color:var(--muted); white-space:nowrap}
+.ref-table td:not(:first-child){font-family:var(--greek); font-size:16px}
+
+.sm-row{display:grid; grid-template-columns:minmax(180px,1fr) 2fr max-content; gap:12px; align-items:center;
+  padding:5px 0; border-bottom:1px dotted var(--line); font-size:13.5px}
+.sm-name{color:var(--muted)}
+.sm-bar{height:8px; background:var(--line); border-radius:4px; overflow:hidden}
+.sm-bar i{display:block; height:100%}
+.sm-num{font-family:var(--mono); font-size:12px; color:var(--ivory)}
+.review-tag{color:var(--laurel)}
+.hom-badge{font-family:var(--greek); font-style:normal; color:var(--gold);
+  border:1px solid var(--gold); border-radius:999px; padding:1px 9px; font-size:12.5px; white-space:nowrap}
+.acc-form{margin-top:22px; display:flex; flex-wrap:wrap; gap:3px; align-items:baseline}
+.acc-char{font-family:var(--greek); font-size:clamp(30px,6vw,44px); color:var(--ivory);
+  background:none; border:none; border-bottom:2px solid transparent; padding:0 2px; line-height:1.2;
+  text-shadow:0 1px 0 rgba(0,0,0,.6), 0 -1px 0 rgba(255,240,200,.06)}
+button.acc-char{border-bottom-color:var(--wood-dim); cursor:pointer}
+button.acc-char:hover{border-bottom-color:var(--gold)}
+button.acc-char.sel{border-bottom-color:var(--gold); color:var(--gold)}
+.acc-marks{margin-top:16px; display:flex; gap:10px}
+.acc-marks .btn:disabled{opacity:.4; cursor:default}
+.acc-result{font-family:var(--greek); font-size:clamp(30px,6vw,44px); margin-top:22px}
+.acc-result .hit{color:var(--laurel)} .acc-result .miss{color:var(--rubric)}
+.ach-grid{padding:6px 18px 22px; display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px}
+.ach{border:1px solid var(--line); border-radius:6px; padding:10px 12px;
+  display:flex; gap:12px; align-items:center; opacity:.4}
+.ach.got{opacity:1; border-color:var(--gold)}
+.ach-ic{font-family:var(--greek); font-size:19px; color:var(--gold); border:1px solid var(--gold);
+  border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; flex:none}
+.ach-t{font-family:var(--greek); font-size:16px; color:var(--ivory)}
+.ach-d{font-size:12.5px; color:var(--muted)}
+@media (prefers-reduced-motion:reduce){ *{animation:none!important; transition:none!important} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>ΓΥΜΝ<span class="accent">Α</span>ΣΙΟΝ</h1>
+    <p>тренажёр древнегреческой морфологии · аттический диалект</p>
+  </div>
+  <div class="stats">
+    <span class="level-tag" id="levelTag">μαθητής</span>
+    <span class="stat xp">XP <b id="xpVal">0</b></span>
+    <span class="stat streak">серия <b id="streakVal">0</b></span>
+    <span class="stat">точность <b id="accVal">—</b></span>
+    <span class="stat">лучшая серия <b id="bestVal">0</b></span>
+  </div>
+  <div class="xpbar" aria-hidden="true"><i id="xpFill"></i></div>
+</header>
+
+<main>
+  <aside>
+    <div class="panel">
+      <h2>Раздел</h2>
+      <div class="tabs" role="tablist">
+        <button data-sec="nouns" class="on" role="tab" aria-selected="true">Склонения</button>
+        <button data-sec="verbs" role="tab" aria-selected="false">Спряжения</button>
+        <button data-sec="ptc" role="tab" aria-selected="false">Причастия</button>
+        <button data-sec="adj" role="tab" aria-selected="false">Прилаг.</button>
+        <button data-sec="pron" role="tab" aria-selected="false">Мест.</button>
+      </div>
+      <div class="chips" id="chipBox"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Сложность</h2>
+      <div class="chips" id="lvlBox"></div>
+      <p class="hint" id="lvlHint"></p>
+    </div>
+
+    <div class="panel">
+      <h2>Упражнение</h2>
+      <div class="modes">
+        <button class="mode on" data-mode="type">Образование · ввод
+          <small>впишите форму с клавиатуры</small></button>
+        <button class="mode" data-mode="choose">Образование · выбор
+          <small>верная форма среди пяти вариантов</small></button>
+        <button class="mode" data-mode="parse">Разбор · сетка
+          <small>укажите разбор в полной таблице</small></button>
+        <button class="mode" data-mode="quiz">Разбор · викторина
+          <small>один верный разбор из пяти</small></button>
+        <button class="mode" data-mode="accent">Ударение
+          <small>поставьте ударение в форме</small></button>
+        <button class="mode" data-mode="paradigm">Вся парадигма
+          <small>заполните таблицу целиком</small></button>
+      </div>
+      <button class="btn" id="sprintBtn" style="margin-top:12px; width:100%">⏱ Спринт — 60 секунд</button>
+      <p class="hint" id="sprintBestHint"></p>
+    </div>
+
+    <div class="panel">
+      <h2>Прогресс</h2>
+      <div style="display:flex; gap:8px; flex-wrap:wrap">
+        <button class="btn" id="expBtn" style="padding:7px 14px; font-size:13.5px">Выгрузить JSON</button>
+        <button class="btn" id="impBtn" style="padding:7px 14px; font-size:13.5px">Загрузить</button>
+        <input type="file" id="impFile" accept="application/json" hidden>
+      </div>
+      <p class="hint">XP, карта точности и очередь повторения — файлом, для переноса между устройствами.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Настройки</h2>
+      <label class="toggle"><input type="checkbox" id="dualOn" checked>
+        <span><b>Двойственное число</b> — включать формы dualis</span></label>
+      <label class="toggle"><input type="checkbox" id="strictDia">
+        <span><b>Диакритика</b> — требовать ударения, придыхания, ι subscriptum</span></label>
+      <p class="hint">Без строгого режима сравниваются только буквы: λογου = λόγου. Подвижное ν (‑σι/‑σιν, ‑ε/‑εν) принимается в обоих вариантах всегда.</p>
+    </div>
+  </aside>
+
+  <section class="tablet-frame" aria-live="polite">
+    <div class="task-label">
+      <span id="taskKind">—</span>
+      <span class="combo" id="comboLabel"></span>
+    </div>
+    <div id="taskArea"></div>
+    <div class="feedback" id="feedback"></div>
+  </section>
+
+  <details class="ref">
+    <summary>Справочник — парадигмы полностью</summary>
+    <div class="ref-body" id="refBody"></div>
+  </details>
+
+  <details class="ref">
+    <summary>Карта точности — слабые места по разделам</summary>
+    <div class="ref-body" id="statMap" style="display:block"></div>
+  </details>
+
+  <details class="ref">
+    <summary>Ἆθλα — достижения</summary>
+    <div class="ach-grid" id="achGrid"></div>
+  </details>
+</main>
+
+<div class="levelup" id="levelup" role="status">
+  <div class="lv-title" id="lvTitle"></div>
+  <div class="lv-sub" id="lvSub"></div>
+</div>
+
+<script>
+"use strict";
+/* ══════════════ ДАННЫЕ ══════════════
+   Формы в NFC; варианты через | (подвижное ν, дублетные формы).
+   Существительные: sg/pl = [Nom, Gen, Dat, Acc, Voc], du = [Nom.Acc.Voc., Gen.Dat.]  */
+
+const NOUNS = [
+ {lemma:"χώρα", art:"ἡ", gloss:"страна", group:"d1",
+  sg:["χώρα","χώρας","χώρᾳ","χώραν","χώρα"],
+  pl:["χῶραι","χωρῶν","χώραις","χώρας","χῶραι"],
+  du:["χώρα","χώραιν"]},
+ {lemma:"τιμή", art:"ἡ", gloss:"честь", group:"d1",
+  sg:["τιμή","τιμῆς","τιμῇ","τιμήν","τιμή"],
+  pl:["τιμαί","τιμῶν","τιμαῖς","τιμάς","τιμαί"],
+  du:["τιμά","τιμαῖν"]},
+ {lemma:"θάλαττα", art:"ἡ", gloss:"море", group:"d1",
+  sg:["θάλαττα","θαλάττης","θαλάττῃ","θάλατταν","θάλαττα"],
+  pl:["θάλατται","θαλαττῶν","θαλάτταις","θαλάττας","θάλατται"],
+  du:["θαλάττα","θαλάτταιν"]},
+ {lemma:"πολίτης", art:"ὁ", gloss:"гражданин", group:"d1",
+  sg:["πολίτης","πολίτου","πολίτῃ","πολίτην","πολῖτα"],
+  pl:["πολῖται","πολιτῶν","πολίταις","πολίτας","πολῖται"],
+  du:["πολίτα","πολίταιν"]},
+ {lemma:"νεανίας", art:"ὁ", gloss:"юноша", group:"d1",
+  sg:["νεανίας","νεανίου","νεανίᾳ","νεανίαν","νεανία"],
+  pl:["νεανίαι","νεανιῶν","νεανίαις","νεανίας","νεανίαι"],
+  du:["νεανία","νεανίαιν"]},
+ {lemma:"λόγος", art:"ὁ", gloss:"слово, речь", group:"d2",
+  sg:["λόγος","λόγου","λόγῳ","λόγον","λόγε"],
+  pl:["λόγοι","λόγων","λόγοις","λόγους","λόγοι"],
+  du:["λόγω","λόγοιν"]},
+ {lemma:"ἄνθρωπος", art:"ὁ", gloss:"человек", group:"d2",
+  sg:["ἄνθρωπος","ἀνθρώπου","ἀνθρώπῳ","ἄνθρωπον","ἄνθρωπε"],
+  pl:["ἄνθρωποι","ἀνθρώπων","ἀνθρώποις","ἀνθρώπους","ἄνθρωποι"],
+  du:["ἀνθρώπω","ἀνθρώποιν"]},
+ {lemma:"δῶρον", art:"τό", gloss:"дар", group:"d2",
+  sg:["δῶρον","δώρου","δώρῳ","δῶρον","δῶρον"],
+  pl:["δῶρα","δώρων","δώροις","δῶρα","δῶρα"],
+  du:["δώρω","δώροιν"]},
+ {lemma:"φύλαξ", art:"ὁ", gloss:"страж", group:"d3",
+  sg:["φύλαξ","φύλακος","φύλακι","φύλακα","φύλαξ"],
+  pl:["φύλακες","φυλάκων","φύλαξι|φύλαξιν","φύλακας","φύλακες"],
+  du:["φύλακε","φυλάκοιν"]},
+ {lemma:"ἐλπίς", art:"ἡ", gloss:"надежда", group:"d3",
+  sg:["ἐλπίς","ἐλπίδος","ἐλπίδι","ἐλπίδα","ἐλπί|ἐλπίς"],
+  pl:["ἐλπίδες","ἐλπίδων","ἐλπίσι|ἐλπίσιν","ἐλπίδας","ἐλπίδες"],
+  du:["ἐλπίδε","ἐλπίδοιν"]},
+ {lemma:"γέρων", art:"ὁ", gloss:"старик", group:"d3",
+  sg:["γέρων","γέροντος","γέροντι","γέροντα","γέρον"],
+  pl:["γέροντες","γερόντων","γέρουσι|γέρουσιν","γέροντας","γέροντες"],
+  du:["γέροντε","γερόντοιν"]},
+ {lemma:"σῶμα", art:"τό", gloss:"тело", group:"d3",
+  sg:["σῶμα","σώματος","σώματι","σῶμα","σῶμα"],
+  pl:["σώματα","σωμάτων","σώμασι|σώμασιν","σώματα","σώματα"],
+  du:["σώματε","σωμάτοιν"]},
+ {lemma:"γένος", art:"τό", gloss:"род", group:"d3",
+  sg:["γένος","γένους","γένει","γένος","γένος"],
+  pl:["γένη","γενῶν","γένεσι|γένεσιν","γένη","γένη"],
+  du:["γένει","γενοῖν"]},
+ {lemma:"πόλις", art:"ἡ", gloss:"город", group:"d3",
+  sg:["πόλις","πόλεως","πόλει","πόλιν","πόλι"],
+  pl:["πόλεις","πόλεων","πόλεσι|πόλεσιν","πόλεις","πόλεις"],
+  du:["πόλει","πολέοιν"]},
+ {lemma:"πόλεμος", art:"ὁ", gloss:"война (гомер.)", group:"hom",
+  sg:["πόλεμος","πολέμοιο|πολέμου","πολέμῳ","πόλεμον","πόλεμε"],
+  pl:["πόλεμοι","πολέμων","πολέμοισι|πολέμοισιν|πολέμοις","πολέμους","πόλεμοι"],
+  du:["πολέμω","πολέμοιιν"]},
+ {lemma:"θεά", art:"ἡ", gloss:"богиня (гомер.)", group:"hom",
+  sg:["θεά","θεᾶς","θεᾷ","θεάν","θεά"],
+  pl:["θεαί","θεάων|θεῶν","θεῇσι|θεῇσιν|θεαῖς","θεάς","θεαί"],
+  du:["θεά","θεαῖν"]},
+ {lemma:"πατήρ", art:"ὁ", gloss:"отец: полные основы πατέρος, πατέρι (гомер.)", group:"hom", lvl:5,
+  sg:["πατήρ","πατέρος|πατρός","πατέρι|πατρί","πατέρα","πάτερ"],
+  pl:["πατέρες","πατέρων","πατράσι|πατράσιν","πατέρας","πατέρες"],
+  du:["πατέρε","πατέροιιν"]},
+ {lemma:"πατήρ", art:"ὁ", gloss:"отец", group:"d3", lvl:3,
+  sg:["πατήρ","πατρός","πατρί","πατέρα","πάτερ"],
+  pl:["πατέρες","πατέρων","πατράσι|πατράσιν","πατέρας","πατέρες"],
+  du:["πατέρε","πατέροιν"]},
+ {lemma:"βασιλεύς", art:"ὁ", gloss:"царь", group:"d3",
+  sg:["βασιλεύς","βασιλέως","βασιλεῖ","βασιλέα","βασιλεῦ"],
+  pl:["βασιλεῖς","βασιλέων","βασιλεῦσι|βασιλεῦσιν","βασιλέας","βασιλεῖς"],
+  du:["βασιλῆ","βασιλέοιν"]},
+];
+
+/* Глаголы: f = [1 Sg, 2 Sg, 3 Sg, 2 Du, 3 Du, 1 Pl, 2 Pl, 3 Pl]; lvl = уровень сложности */
+const VERBS = [
+/* ── Praesens Act. — уровень I ── */
+ {lemma:"λύω", gloss:"развязывать, освобождать", group:"praes", lvl:1, tense:"Praesens Act.",
+  f:["λύω","λύεις","λύει","λύετον","λύετον","λύομεν","λύετε","λύουσι|λύουσιν"]},
+ {lemma:"παιδεύω", gloss:"воспитывать", group:"praes", lvl:1, tense:"Praesens Act.",
+  f:["παιδεύω","παιδεύεις","παιδεύει","παιδεύετον","παιδεύετον","παιδεύομεν","παιδεύετε","παιδεύουσι|παιδεύουσιν"]},
+ {lemma:"γράφω", gloss:"писать", group:"praes", lvl:1, tense:"Praesens Act.",
+  f:["γράφω","γράφεις","γράφει","γράφετον","γράφετον","γράφομεν","γράφετε","γράφουσι|γράφουσιν"]},
+ {lemma:"πιστεύω", gloss:"верить", group:"praes", lvl:1, tense:"Praesens Act.",
+  f:["πιστεύω","πιστεύεις","πιστεύει","πιστεύετον","πιστεύετον","πιστεύομεν","πιστεύετε","πιστεύουσι|πιστεύουσιν"]},
+ {lemma:"θύω", gloss:"приносить в жертву", group:"praes", lvl:1, tense:"Praesens Act.",
+  f:["θύω","θύεις","θύει","θύετον","θύετον","θύομεν","θύετε","θύουσι|θύουσιν"]},
+ {lemma:"πέμπω", gloss:"посылать", group:"praes", lvl:1, tense:"Praesens Act.",
+  f:["πέμπω","πέμπεις","πέμπει","πέμπετον","πέμπετον","πέμπομεν","πέμπετε","πέμπουσι|πέμπουσιν"]},
+ {lemma:"φυλάττω", gloss:"сторожить", group:"praes", lvl:2, tense:"Praesens Act.",
+  f:["φυλάττω","φυλάττεις","φυλάττει","φυλάττετον","φυλάττετον","φυλάττομεν","φυλάττετε","φυλάττουσι|φυλάττουσιν"]},
+ {lemma:"νομίζω", gloss:"считать, полагать", group:"praes", lvl:2, tense:"Praesens Act.",
+  f:["νομίζω","νομίζεις","νομίζει","νομίζετον","νομίζετον","νομίζομεν","νομίζετε","νομίζουσι|νομίζουσιν"]},
+ {lemma:"βάλλω", gloss:"бросать", group:"praes", lvl:2, tense:"Praesens Act.",
+  f:["βάλλω","βάλλεις","βάλλει","βάλλετον","βάλλετον","βάλλομεν","βάλλετε","βάλλουσι|βάλλουσιν"]},
+ {lemma:"φαίνω", gloss:"показывать", group:"praes", lvl:2, tense:"Praesens Act.",
+  f:["φαίνω","φαίνεις","φαίνει","φαίνετον","φαίνετον","φαίνομεν","φαίνετε","φαίνουσι|φαίνουσιν"]},
+/* ── Imperfectum Act. ── */
+ {lemma:"λύω", gloss:"развязывать", group:"impf", lvl:1, tense:"Imperfectum Act.",
+  f:["ἔλυον","ἔλυες","ἔλυε|ἔλυεν","ἐλύετον","ἐλυέτην","ἐλύομεν","ἐλύετε","ἔλυον"]},
+ {lemma:"παιδεύω", gloss:"воспитывать", group:"impf", lvl:1, tense:"Imperfectum Act.",
+  f:["ἐπαίδευον","ἐπαίδευες","ἐπαίδευε|ἐπαίδευεν","ἐπαιδεύετον","ἐπαιδευέτην","ἐπαιδεύομεν","ἐπαιδεύετε","ἐπαίδευον"]},
+ {lemma:"ἄγω", gloss:"вести", group:"impf", lvl:2, tense:"Imperfectum Act.",
+  f:["ἦγον","ἦγες","ἦγε|ἦγεν","ἤγετον","ἠγέτην","ἤγομεν","ἤγετε","ἦγον"]},
+ {lemma:"φυλάττω", gloss:"сторожить", group:"impf", lvl:2, tense:"Imperfectum Act.",
+  f:["ἐφύλαττον","ἐφύλαττες","ἐφύλαττε|ἐφύλαττεν","ἐφυλάττετον","ἐφυλαττέτην","ἐφυλάττομεν","ἐφυλάττετε","ἐφύλαττον"]},
+ {lemma:"ἔχω", gloss:"иметь", group:"impf", lvl:2, tense:"Imperfectum Act.",
+  f:["εἶχον","εἶχες","εἶχε|εἶχεν","εἴχετον","εἰχέτην","εἴχομεν","εἴχετε","εἶχον"]},
+ {lemma:"ἐθέλω", gloss:"желать", group:"impf", lvl:2, tense:"Imperfectum Act.",
+  f:["ἤθελον","ἤθελες","ἤθελε|ἤθελεν","ἠθέλετον","ἠθελέτην","ἠθέλομεν","ἠθέλετε","ἤθελον"]},
+/* ── Futurum Act. ── */
+ {lemma:"λύω", gloss:"развязывать", group:"fut", lvl:1, tense:"Futurum Act.",
+  f:["λύσω","λύσεις","λύσει","λύσετον","λύσετον","λύσομεν","λύσετε","λύσουσι|λύσουσιν"]},
+ {lemma:"γράφω", gloss:"писать", group:"fut", lvl:1, tense:"Futurum Act.",
+  f:["γράψω","γράψεις","γράψει","γράψετον","γράψετον","γράψομεν","γράψετε","γράψουσι|γράψουσιν"]},
+ {lemma:"πέμπω", gloss:"посылать", group:"fut", lvl:2, tense:"Futurum Act.",
+  f:["πέμψω","πέμψεις","πέμψει","πέμψετον","πέμψετον","πέμψομεν","πέμψετε","πέμψουσι|πέμψουσιν"]},
+ {lemma:"φυλάττω", gloss:"сторожить", group:"fut", lvl:2, tense:"Futurum Act.",
+  f:["φυλάξω","φυλάξεις","φυλάξει","φυλάξετον","φυλάξετον","φυλάξομεν","φυλάξετε","φυλάξουσι|φυλάξουσιν"]},
+ {lemma:"πείθω", gloss:"убеждать", group:"fut", lvl:2, tense:"Futurum Act.",
+  f:["πείσω","πείσεις","πείσει","πείσετον","πείσετον","πείσομεν","πείσετε","πείσουσι|πείσουσιν"]},
+ {lemma:"νομίζω", gloss:"считать (fut. atticum)", group:"fut", lvl:3, tense:"Futurum Act.",
+  f:["νομιῶ","νομιεῖς","νομιεῖ","νομιεῖτον","νομιεῖτον","νομιοῦμεν","νομιεῖτε","νομιοῦσι|νομιοῦσιν"]},
+ {lemma:"ἀγγέλλω", gloss:"возвещать (fut. contractum)", group:"fut", lvl:3, tense:"Futurum Act.",
+  f:["ἀγγελῶ","ἀγγελεῖς","ἀγγελεῖ","ἀγγελεῖτον","ἀγγελεῖτον","ἀγγελοῦμεν","ἀγγελεῖτε","ἀγγελοῦσι|ἀγγελοῦσιν"]},
+ {lemma:"μένω", gloss:"оставаться (fut. contractum)", group:"fut", lvl:3, tense:"Futurum Act.",
+  f:["μενῶ","μενεῖς","μενεῖ","μενεῖτον","μενεῖτον","μενοῦμεν","μενεῖτε","μενοῦσι|μενοῦσιν"]},
+ {lemma:"φαίνω", gloss:"показывать (fut. contractum)", group:"fut", lvl:3, tense:"Futurum Act.",
+  f:["φανῶ","φανεῖς","φανεῖ","φανεῖτον","φανεῖτον","φανοῦμεν","φανεῖτε","φανοῦσι|φανοῦσιν"]},
+/* ── Futurum medii с активным значением ── */
+ {lemma:"ἀκούω", gloss:"слышать (fut. medii)", group:"futM", lvl:3, tense:"Futurum Med.",
+  f:["ἀκούσομαι","ἀκούσῃ|ἀκούσει","ἀκούσεται","ἀκούσεσθον","ἀκούσεσθον","ἀκουσόμεθα","ἀκούσεσθε","ἀκούσονται"]},
+ {lemma:"λαμβάνω", gloss:"брать (fut. medii)", group:"futM", lvl:3, tense:"Futurum Med.",
+  f:["λήψομαι","λήψῃ|λήψει","λήψεται","λήψεσθον","λήψεσθον","ληψόμεθα","λήψεσθε","λήψονται"]},
+/* ── Aoristus I Act. (pura и muta) ── */
+ {lemma:"λύω", gloss:"развязывать", group:"aor", lvl:1, tense:"Aoristus I Act.",
+  f:["ἔλυσα","ἔλυσας","ἔλυσε|ἔλυσεν","ἐλύσατον","ἐλυσάτην","ἐλύσαμεν","ἐλύσατε","ἔλυσαν"]},
+ {lemma:"παιδεύω", gloss:"воспитывать", group:"aor", lvl:1, tense:"Aoristus I Act.",
+  f:["ἐπαίδευσα","ἐπαίδευσας","ἐπαίδευσε|ἐπαίδευσεν","ἐπαιδεύσατον","ἐπαιδευσάτην","ἐπαιδεύσαμεν","ἐπαιδεύσατε","ἐπαίδευσαν"]},
+ {lemma:"γράφω", gloss:"писать", group:"aor", lvl:2, tense:"Aoristus I Act.",
+  f:["ἔγραψα","ἔγραψας","ἔγραψε|ἔγραψεν","ἐγράψατον","ἐγραψάτην","ἐγράψαμεν","ἐγράψατε","ἔγραψαν"]},
+ {lemma:"πέμπω", gloss:"посылать", group:"aor", lvl:2, tense:"Aoristus I Act.",
+  f:["ἔπεμψα","ἔπεμψας","ἔπεμψε|ἔπεμψεν","ἐπέμψατον","ἐπεμψάτην","ἐπέμψαμεν","ἐπέμψατε","ἔπεμψαν"]},
+ {lemma:"φυλάττω", gloss:"сторожить", group:"aor", lvl:2, tense:"Aoristus I Act.",
+  f:["ἐφύλαξα","ἐφύλαξας","ἐφύλαξε|ἐφύλαξεν","ἐφυλάξατον","ἐφυλαξάτην","ἐφυλάξαμεν","ἐφυλάξατε","ἐφύλαξαν"]},
+ {lemma:"πείθω", gloss:"убеждать", group:"aor", lvl:2, tense:"Aoristus I Act.",
+  f:["ἔπεισα","ἔπεισας","ἔπεισε|ἔπεισεν","ἐπείσατον","ἐπεισάτην","ἐπείσαμεν","ἐπείσατε","ἔπεισαν"]},
+ {lemma:"νομίζω", gloss:"считать, полагать", group:"aor", lvl:2, tense:"Aoristus I Act.",
+  f:["ἐνόμισα","ἐνόμισας","ἐνόμισε|ἐνόμισεν","ἐνομίσατον","ἐνομισάτην","ἐνομίσαμεν","ἐνομίσατε","ἐνόμισαν"]},
+ {lemma:"ἀναγκάζω", gloss:"заставлять", group:"aor", lvl:2, tense:"Aoristus I Act.",
+  f:["ἠνάγκασα","ἠνάγκασας","ἠνάγκασε|ἠνάγκασεν","ἠναγκάσατον","ἠναγκασάτην","ἠναγκάσαμεν","ἠναγκάσατε","ἠνάγκασαν"]},
+/* ── Aoristus I verba liquida ── */
+ {lemma:"ἀγγέλλω", gloss:"возвещать", group:"aorL", lvl:3, tense:"Aoristus I Act. (liquida)",
+  f:["ἤγγειλα","ἤγγειλας","ἤγγειλε|ἤγγειλεν","ἠγγείλατον","ἠγγειλάτην","ἠγγείλαμεν","ἠγγείλατε","ἤγγειλαν"]},
+ {lemma:"φαίνω", gloss:"показывать", group:"aorL", lvl:3, tense:"Aoristus I Act. (liquida)",
+  f:["ἔφηνα","ἔφηνας","ἔφηνε|ἔφηνεν","ἐφήνατον","ἐφηνάτην","ἐφήναμεν","ἐφήνατε","ἔφηναν"]},
+ {lemma:"μένω", gloss:"оставаться", group:"aorL", lvl:3, tense:"Aoristus I Act. (liquida)",
+  f:["ἔμεινα","ἔμεινας","ἔμεινε|ἔμεινεν","ἐμείνατον","ἐμεινάτην","ἐμείναμεν","ἐμείνατε","ἔμειναν"]},
+ {lemma:"στέλλω", gloss:"посылать, снаряжать", group:"aorL", lvl:3, tense:"Aoristus I Act. (liquida)",
+  f:["ἔστειλα","ἔστειλας","ἔστειλε|ἔστειλεν","ἐστείλατον","ἐστειλάτην","ἐστείλαμεν","ἐστείλατε","ἔστειλαν"]},
+ {lemma:"κρίνω", gloss:"судить", group:"aorL", lvl:3, tense:"Aoristus I Act. (liquida)",
+  f:["ἔκρινα","ἔκρινας","ἔκρινε|ἔκρινεν","ἐκρίνατον","ἐκρινάτην","ἐκρίναμεν","ἐκρίνατε","ἔκριναν"]},
+ {lemma:"αἴρω", gloss:"поднимать", group:"aorL", lvl:3, tense:"Aoristus I Act. (liquida)",
+  f:["ἦρα","ἦρας","ἦρε|ἦρεν","ἤρατον","ἠράτην","ἤραμεν","ἤρατε","ἦραν"]},
+/* ── Aoristus II Act. и Med. ── */
+ {lemma:"λείπω", gloss:"оставлять", group:"aor2", lvl:3, tense:"Aoristus II Act.",
+  f:["ἔλιπον","ἔλιπες","ἔλιπε|ἔλιπεν","ἐλίπετον","ἐλιπέτην","ἐλίπομεν","ἐλίπετε","ἔλιπον"]},
+ {lemma:"λαμβάνω", gloss:"брать, получать", group:"aor2", lvl:3, tense:"Aoristus II Act.",
+  f:["ἔλαβον","ἔλαβες","ἔλαβε|ἔλαβεν","ἐλάβετον","ἐλαβέτην","ἐλάβομεν","ἐλάβετε","ἔλαβον"]},
+ {lemma:"φεύγω", gloss:"бежать, спасаться", group:"aor2", lvl:3, tense:"Aoristus II Act.",
+  f:["ἔφυγον","ἔφυγες","ἔφυγε|ἔφυγεν","ἐφύγετον","ἐφυγέτην","ἐφύγομεν","ἐφύγετε","ἔφυγον"]},
+ {lemma:"βάλλω", gloss:"бросать", group:"aor2", lvl:3, tense:"Aoristus II Act.",
+  f:["ἔβαλον","ἔβαλες","ἔβαλε|ἔβαλεν","ἐβάλετον","ἐβαλέτην","ἐβάλομεν","ἐβάλετε","ἔβαλον"]},
+ {lemma:"ἄγω", gloss:"вести (с удвоением основы)", group:"aor2", lvl:3, tense:"Aoristus II Act.",
+  f:["ἤγαγον","ἤγαγες","ἤγαγε|ἤγαγεν","ἠγάγετον","ἠγαγέτην","ἠγάγομεν","ἠγάγετε","ἤγαγον"]},
+ {lemma:"ὁράω", gloss:"видеть (аор. εἶδον)", group:"aor2", lvl:3, tense:"Aoristus II Act.",
+  f:["εἶδον","εἶδες","εἶδε|εἶδεν","εἴδετον","εἰδέτην","εἴδομεν","εἴδετε","εἶδον"]},
+ {lemma:"λέγω", gloss:"говорить (аор. εἶπον)", group:"aor2", lvl:3, tense:"Aoristus II Act.",
+  f:["εἶπον","εἶπες|εἶπας","εἶπε|εἶπεν","εἴπετον","εἰπέτην","εἴπομεν","εἴπετε","εἶπον"]},
+ {lemma:"ἔρχομαι", gloss:"идти (аор. ἦλθον)", group:"aor2", lvl:3, tense:"Aoristus II Act.",
+  f:["ἦλθον","ἦλθες","ἦλθε|ἦλθεν","ἤλθετον","ἠλθέτην","ἤλθομεν","ἤλθετε","ἦλθον"]},
+ {lemma:"ἔχω", gloss:"иметь (аор. ἔσχον)", group:"aor2", lvl:3, tense:"Aoristus II Act.",
+  f:["ἔσχον","ἔσχες","ἔσχε|ἔσχεν","ἔσχετον","ἐσχέτην","ἔσχομεν","ἔσχετε","ἔσχον"]},
+ {lemma:"γίγνομαι", gloss:"становиться", group:"aor2", lvl:3, tense:"Aoristus II Med.",
+  f:["ἐγενόμην","ἐγένου","ἐγένετο","ἐγένεσθον","ἐγενέσθην","ἐγενόμεθα","ἐγένεσθε","ἐγένοντο"]},
+ {lemma:"πυνθάνομαι", gloss:"узнавать, расспрашивать", group:"aor2", lvl:3, tense:"Aoristus II Med.",
+  f:["ἐπυθόμην","ἐπύθου","ἐπύθετο","ἐπύθεσθον","ἐπυθέσθην","ἐπυθόμεθα","ἐπύθεσθε","ἐπύθοντο"]},
+/* ── Корневые аористы ── */
+ {lemma:"βαίνω", gloss:"идти, шагать", group:"aorR", lvl:3, tense:"Aoristus (корневой)",
+  f:["ἔβην","ἔβης","ἔβη","ἔβητον","ἐβήτην","ἔβημεν","ἔβητε","ἔβησαν"]},
+ {lemma:"γιγνώσκω", gloss:"узнавать, познавать", group:"aorR", lvl:3, tense:"Aoristus (корневой)",
+  f:["ἔγνων","ἔγνως","ἔγνω","ἔγνωτον","ἐγνώτην","ἔγνωμεν","ἔγνωτε","ἔγνωσαν"]},
+ {lemma:"ἵστημι", gloss:"становиться (аор. ἔστην)", group:"aorR", lvl:3, tense:"Aoristus (корневой)",
+  f:["ἔστην","ἔστης","ἔστη","ἔστητον","ἐστήτην","ἔστημεν","ἔστητε","ἔστησαν"]},
+/* ── Aoristus I Pass. ── */
+ {lemma:"λύω", gloss:"развязывать", group:"aorP", lvl:2, tense:"Aoristus I Pass.",
+  f:["ἐλύθην","ἐλύθης","ἐλύθη","ἐλύθητον","ἐλυθήτην","ἐλύθημεν","ἐλύθητε","ἐλύθησαν"]},
+ {lemma:"παιδεύω", gloss:"воспитывать", group:"aorP", lvl:2, tense:"Aoristus I Pass.",
+  f:["ἐπαιδεύθην","ἐπαιδεύθης","ἐπαιδεύθη","ἐπαιδεύθητον","ἐπαιδευθήτην","ἐπαιδεύθημεν","ἐπαιδεύθητε","ἐπαιδεύθησαν"]},
+ {lemma:"πέμπω", gloss:"посылать", group:"aorP", lvl:2, tense:"Aoristus I Pass.",
+  f:["ἐπέμφθην","ἐπέμφθης","ἐπέμφθη","ἐπέμφθητον","ἐπεμφθήτην","ἐπέμφθημεν","ἐπέμφθητε","ἐπέμφθησαν"]},
+ {lemma:"φυλάττω", gloss:"сторожить", group:"aorP", lvl:2, tense:"Aoristus I Pass.",
+  f:["ἐφυλάχθην","ἐφυλάχθης","ἐφυλάχθη","ἐφυλάχθητον","ἐφυλαχθήτην","ἐφυλάχθημεν","ἐφυλάχθητε","ἐφυλάχθησαν"]},
+ {lemma:"κομίζω", gloss:"приносить", group:"aorP", lvl:2, tense:"Aoristus I Pass.",
+  f:["ἐκομίσθην","ἐκομίσθης","ἐκομίσθη","ἐκομίσθητον","ἐκομισθήτην","ἐκομίσθημεν","ἐκομίσθητε","ἐκομίσθησαν"]},
+ {lemma:"ἀγγέλλω", gloss:"возвещать", group:"aorP", lvl:3, tense:"Aoristus I Pass.",
+  f:["ἠγγέλθην","ἠγγέλθης","ἠγγέλθη","ἠγγέλθητον","ἠγγελθήτην","ἠγγέλθημεν","ἠγγέλθητε","ἠγγέλθησαν"]},
+/* ── Aoristus II Pass. ── */
+ {lemma:"γράφω", gloss:"писать", group:"aorP2", lvl:3, tense:"Aoristus II Pass.",
+  f:["ἐγράφην","ἐγράφης","ἐγράφη","ἐγράφητον","ἐγραφήτην","ἐγράφημεν","ἐγράφητε","ἐγράφησαν"]},
+ {lemma:"φαίνω", gloss:"показывать; pass. являться", group:"aorP2", lvl:3, tense:"Aoristus II Pass.",
+  f:["ἐφάνην","ἐφάνης","ἐφάνη","ἐφάνητον","ἐφανήτην","ἐφάνημεν","ἐφάνητε","ἐφάνησαν"]},
+ {lemma:"στέλλω", gloss:"посылать", group:"aorP2", lvl:3, tense:"Aoristus II Pass.",
+  f:["ἐστάλην","ἐστάλης","ἐστάλη","ἐστάλητον","ἐσταλήτην","ἐστάλημεν","ἐστάλητε","ἐστάλησαν"]},
+ {lemma:"φθείρω", gloss:"уничтожать", group:"aorP2", lvl:3, tense:"Aoristus II Pass.",
+  f:["ἐφθάρην","ἐφθάρης","ἐφθάρη","ἐφθάρητον","ἐφθαρήτην","ἐφθάρημεν","ἐφθάρητε","ἐφθάρησαν"]},
+ {lemma:"τρέπω", gloss:"поворачивать", group:"aorP2", lvl:3, tense:"Aoristus II Pass.",
+  f:["ἐτράπην","ἐτράπης","ἐτράπη","ἐτράπητον","ἐτραπήτην","ἐτράπημεν","ἐτράπητε","ἐτράπησαν"]},
+/* ── Futurum Pass. ── */
+ {lemma:"λύω", gloss:"развязывать", group:"futP", lvl:3, tense:"Futurum I Pass.",
+  f:["λυθήσομαι","λυθήσῃ|λυθήσει","λυθήσεται","λυθήσεσθον","λυθήσεσθον","λυθησόμεθα","λυθήσεσθε","λυθήσονται"]},
+ {lemma:"πέμπω", gloss:"посылать", group:"futP", lvl:3, tense:"Futurum I Pass.",
+  f:["πεμφθήσομαι","πεμφθήσῃ|πεμφθήσει","πεμφθήσεται","πεμφθήσεσθον","πεμφθήσεσθον","πεμφθησόμεθα","πεμφθήσεσθε","πεμφθήσονται"]},
+ {lemma:"φαίνω", gloss:"показывать; pass. являться", group:"futP", lvl:3, tense:"Futurum II Pass.",
+  f:["φανήσομαι","φανήσῃ|φανήσει","φανήσεται","φανήσεσθον","φανήσεσθον","φανησόμεθα","φανήσεσθε","φανήσονται"]},
+/* ── Perfectum Act. ── */
+ {lemma:"λύω", gloss:"развязывать", group:"perf", lvl:3, tense:"Perfectum I Act.",
+  f:["λέλυκα","λέλυκας","λέλυκε|λέλυκεν","λελύκατον","λελύκατον","λελύκαμεν","λελύκατε","λελύκασι|λελύκασιν"]},
+ {lemma:"παιδεύω", gloss:"воспитывать", group:"perf", lvl:3, tense:"Perfectum I Act.",
+  f:["πεπαίδευκα","πεπαίδευκας","πεπαίδευκε|πεπαίδευκεν","πεπαιδεύκατον","πεπαιδεύκατον","πεπαιδεύκαμεν","πεπαιδεύκατε","πεπαιδεύκασι|πεπαιδεύκασιν"]},
+ {lemma:"γράφω", gloss:"писать", group:"perf", lvl:3, tense:"Perfectum II Act.",
+  f:["γέγραφα","γέγραφας","γέγραφε|γέγραφεν","γεγράφατον","γεγράφατον","γεγράφαμεν","γεγράφατε","γεγράφασι|γεγράφασιν"]},
+ {lemma:"πέμπω", gloss:"посылать", group:"perf", lvl:3, tense:"Perfectum II Act.",
+  f:["πέπομφα","πέπομφας","πέπομφε|πέπομφεν","πεπόμφατον","πεπόμφατον","πεπόμφαμεν","πεπόμφατε","πεπόμφασι|πεπόμφασιν"]},
+ {lemma:"λείπω", gloss:"оставлять", group:"perf", lvl:3, tense:"Perfectum II Act.",
+  f:["λέλοιπα","λέλοιπας","λέλοιπε|λέλοιπεν","λελοίπατον","λελοίπατον","λελοίπαμεν","λελοίπατε","λελοίπασι|λελοίπασιν"]},
+ {lemma:"φεύγω", gloss:"бежать", group:"perf", lvl:3, tense:"Perfectum II Act.",
+  f:["πέφευγα","πέφευγας","πέφευγε|πέφευγεν","πεφεύγατον","πεφεύγατον","πεφεύγαμεν","πεφεύγατε","πεφεύγασι|πεφεύγασιν"]},
+/* ── Perfectum Med.-Pass. ── */
+ {lemma:"λύω", gloss:"развязывать", group:"perfMP", lvl:4, tense:"Perfectum Med.-Pass.",
+  f:["λέλυμαι","λέλυσαι","λέλυται","λέλυσθον","λέλυσθον","λελύμεθα","λέλυσθε","λέλυνται"]},
+ {lemma:"παιδεύω", gloss:"воспитывать", group:"perfMP", lvl:4, tense:"Perfectum Med.-Pass.",
+  f:["πεπαίδευμαι","πεπαίδευσαι","πεπαίδευται","πεπαίδευσθον","πεπαίδευσθον","πεπαιδεύμεθα","πεπαίδευσθε","πεπαίδευνται"]},
+ {lemma:"γράφω", gloss:"писать (3 Pl. описательно)", group:"perfMP", lvl:4, tense:"Perfectum Med.-Pass.",
+  f:["γέγραμμαι","γέγραψαι","γέγραπται","γέγραφθον","γέγραφθον","γεγράμμεθα","γέγραφθε","γεγραμμένοι εἰσί|γεγραμμένοι εἰσίν"]},
+/* ── Praesens Med.-Pass. и отложительные ── */
+ {lemma:"λύω", gloss:"развязывать", group:"mp", lvl:1, tense:"Praesens Med.-Pass.",
+  f:["λύομαι","λύῃ|λύει","λύεται","λύεσθον","λύεσθον","λυόμεθα","λύεσθε","λύονται"]},
+ {lemma:"παιδεύω", gloss:"воспитывать", group:"mp", lvl:1, tense:"Praesens Med.-Pass.",
+  f:["παιδεύομαι","παιδεύῃ|παιδεύει","παιδεύεται","παιδεύεσθον","παιδεύεσθον","παιδευόμεθα","παιδεύεσθε","παιδεύονται"]},
+ {lemma:"βούλομαι", gloss:"хотеть (depon.)", group:"mp", lvl:2, tense:"Praesens Med.-Pass.",
+  f:["βούλομαι","βούλῃ|βούλει","βούλεται","βούλεσθον","βούλεσθον","βουλόμεθα","βούλεσθε","βούλονται"]},
+ {lemma:"γίγνομαι", gloss:"становиться (depon.)", group:"mp", lvl:2, tense:"Praesens Med.-Pass.",
+  f:["γίγνομαι","γίγνῃ|γίγνει","γίγνεται","γίγνεσθον","γίγνεσθον","γιγνόμεθα","γίγνεσθε","γίγνονται"]},
+ {lemma:"ἔρχομαι", gloss:"идти, приходить (depon.)", group:"mp", lvl:2, tense:"Praesens Med.-Pass.",
+  f:["ἔρχομαι","ἔρχῃ|ἔρχει","ἔρχεται","ἔρχεσθον","ἔρχεσθον","ἐρχόμεθα","ἔρχεσθε","ἔρχονται"]},
+ {lemma:"δέχομαι", gloss:"принимать (depon.)", group:"mp", lvl:2, tense:"Praesens Med.-Pass.",
+  f:["δέχομαι","δέχῃ|δέχει","δέχεται","δέχεσθον","δέχεσθον","δεχόμεθα","δέχεσθε","δέχονται"]},
+/* ── Verba contracta ── */
+ {lemma:"τιμάω", gloss:"почитать", group:"contr", lvl:2, tense:"Praesens Act. (contr.)",
+  f:["τιμῶ","τιμᾷς","τιμᾷ","τιμᾶτον","τιμᾶτον","τιμῶμεν","τιμᾶτε","τιμῶσι|τιμῶσιν"]},
+ {lemma:"ποιέω", gloss:"делать", group:"contr", lvl:2, tense:"Praesens Act. (contr.)",
+  f:["ποιῶ","ποιεῖς","ποιεῖ","ποιεῖτον","ποιεῖτον","ποιοῦμεν","ποιεῖτε","ποιοῦσι|ποιοῦσιν"]},
+ {lemma:"δηλόω", gloss:"являть", group:"contr", lvl:2, tense:"Praesens Act. (contr.)",
+  f:["δηλῶ","δηλοῖς","δηλοῖ","δηλοῦτον","δηλοῦτον","δηλοῦμεν","δηλοῦτε","δηλοῦσι|δηλοῦσιν"]},
+ {lemma:"ὁράω", gloss:"видеть", group:"contr", lvl:2, tense:"Praesens Act. (contr.)",
+  f:["ὁρῶ","ὁρᾷς","ὁρᾷ","ὁρᾶτον","ὁρᾶτον","ὁρῶμεν","ὁρᾶτε","ὁρῶσι|ὁρῶσιν"]},
+ {lemma:"φιλέω", gloss:"любить", group:"contr", lvl:2, tense:"Praesens Act. (contr.)",
+  f:["φιλῶ","φιλεῖς","φιλεῖ","φιλεῖτον","φιλεῖτον","φιλοῦμεν","φιλεῖτε","φιλοῦσι|φιλοῦσιν"]},
+ {lemma:"ἀξιόω", gloss:"считать достойным", group:"contr", lvl:2, tense:"Praesens Act. (contr.)",
+  f:["ἀξιῶ","ἀξιοῖς","ἀξιοῖ","ἀξιοῦτον","ἀξιοῦτον","ἀξιοῦμεν","ἀξιοῦτε","ἀξιοῦσι|ἀξιοῦσιν"]},
+ {lemma:"ζάω", gloss:"жить (слияние в η)", group:"contr", lvl:3, tense:"Praesens Act. (contr.)",
+  f:["ζῶ","ζῇς","ζῇ","ζῆτον","ζῆτον","ζῶμεν","ζῆτε","ζῶσι|ζῶσιν"]},
+ {lemma:"τιμάω", gloss:"почитать", group:"contr", lvl:3, tense:"Imperfectum Act. (contr.)",
+  f:["ἐτίμων","ἐτίμας","ἐτίμα","ἐτιμᾶτον","ἐτιμάτην","ἐτιμῶμεν","ἐτιμᾶτε","ἐτίμων"]},
+ {lemma:"ποιέω", gloss:"делать", group:"contr", lvl:3, tense:"Imperfectum Act. (contr.)",
+  f:["ἐποίουν","ἐποίεις","ἐποίει","ἐποιεῖτον","ἐποιείτην","ἐποιοῦμεν","ἐποιεῖτε","ἐποίουν"]},
+ {lemma:"δηλόω", gloss:"являть", group:"contr", lvl:3, tense:"Imperfectum Act. (contr.)",
+  f:["ἐδήλουν","ἐδήλους","ἐδήλου","ἐδηλοῦτον","ἐδηλούτην","ἐδηλοῦμεν","ἐδηλοῦτε","ἐδήλουν"]},
+/* ── Второе спряжение (глаголы на -μι) ── */
+ {lemma:"τίθημι", gloss:"класть", group:"mi", lvl:4, tense:"Praesens Act.",
+  f:["τίθημι","τίθης","τίθησι|τίθησιν","τίθετον","τίθετον","τίθεμεν","τίθετε","τιθέασι|τιθέασιν"]},
+ {lemma:"δίδωμι", gloss:"давать", group:"mi", lvl:4, tense:"Praesens Act.",
+  f:["δίδωμι","δίδως","δίδωσι|δίδωσιν","δίδοτον","δίδοτον","δίδομεν","δίδοτε","διδόασι|διδόασιν"]},
+ {lemma:"ἵστημι", gloss:"ставить", group:"mi", lvl:4, tense:"Praesens Act.",
+  f:["ἵστημι","ἵστης","ἵστησι|ἵστησιν","ἵστατον","ἵστατον","ἵσταμεν","ἵστατε","ἱστᾶσι|ἱστᾶσιν"]},
+ {lemma:"ἵημι", gloss:"пускать, посылать", group:"mi", lvl:4, tense:"Praesens Act.",
+  f:["ἵημι","ἵης","ἵησι|ἵησιν","ἵετον","ἵετον","ἵεμεν","ἵετε","ἱᾶσι|ἱᾶσιν"]},
+ {lemma:"δείκνυμι", gloss:"показывать", group:"mi", lvl:4, tense:"Praesens Act.",
+  f:["δείκνυμι","δείκνυς","δείκνυσι|δείκνυσιν","δείκνυτον","δείκνυτον","δείκνυμεν","δείκνυτε","δεικνύασι|δεικνύασιν"]},
+ {lemma:"δύναμαι", gloss:"мочь (depon.)", group:"mi", lvl:4, tense:"Praesens Med.-Pass.",
+  f:["δύναμαι","δύνασαι","δύναται","δύνασθον","δύνασθον","δυνάμεθα","δύνασθε","δύνανται"]},
+ {lemma:"τίθημι", gloss:"класть", group:"mi", lvl:4, tense:"Imperfectum Act.",
+  f:["ἐτίθην","ἐτίθεις","ἐτίθει","ἐτίθετον","ἐτιθέτην","ἐτίθεμεν","ἐτίθετε","ἐτίθεσαν"]},
+ {lemma:"δίδωμι", gloss:"давать", group:"mi", lvl:4, tense:"Imperfectum Act.",
+  f:["ἐδίδουν","ἐδίδους","ἐδίδου","ἐδίδοτον","ἐδιδότην","ἐδίδομεν","ἐδίδοτε","ἐδίδοσαν"]},
+ {lemma:"ἵστημι", gloss:"ставить", group:"mi", lvl:4, tense:"Imperfectum Act.",
+  f:["ἵστην","ἵστης","ἵστη","ἵστατον","ἱστάτην","ἵσταμεν","ἵστατε","ἵστασαν"]},
+ {lemma:"τίθημι", gloss:"класть (κ-аорист)", group:"mi", lvl:4, tense:"Aoristus Act.",
+  f:["ἔθηκα","ἔθηκας","ἔθηκε|ἔθηκεν","ἔθετον","ἐθέτην","ἔθεμεν","ἔθετε","ἔθεσαν"]},
+ {lemma:"δίδωμι", gloss:"давать (κ-аорист)", group:"mi", lvl:4, tense:"Aoristus Act.",
+  f:["ἔδωκα","ἔδωκας","ἔδωκε|ἔδωκεν","ἔδοτον","ἐδότην","ἔδομεν","ἔδοτε","ἔδοσαν"]},
+ {lemma:"ἵημι", gloss:"пускать (κ-аорист)", group:"mi", lvl:4, tense:"Aoristus Act.",
+  f:["ἧκα","ἧκας","ἧκε|ἧκεν","εἷτον","εἵτην","εἷμεν","εἷτε","εἷσαν"]},
+ {lemma:"ἵστημι", gloss:"ставить (перех.)", group:"mi", lvl:4, tense:"Aoristus I Act.",
+  f:["ἔστησα","ἔστησας","ἔστησε|ἔστησεν","ἐστήσατον","ἐστησάτην","ἐστήσαμεν","ἐστήσατε","ἔστησαν"]},
+ {lemma:"δείκνυμι", gloss:"показывать", group:"mi", lvl:4, tense:"Aoristus I Act.",
+  f:["ἔδειξα","ἔδειξας","ἔδειξε|ἔδειξεν","ἐδείξατον","ἐδειξάτην","ἐδείξαμεν","ἐδείξατε","ἔδειξαν"]},
+/* ── Неправильные: εἶμι, φημί, οἶδα ── */
+ {lemma:"εἶμι", gloss:"пойду (praes. в знач. fut.)", group:"irr", lvl:4, tense:"Praesens Act.",
+  f:["εἶμι","εἶ","εἶσι|εἶσιν","ἴτον","ἴτον","ἴμεν","ἴτε","ἴασι|ἴασιν"]},
+ {lemma:"φημί", gloss:"говорить, утверждать", group:"irr", lvl:4, tense:"Praesens Act.",
+  f:["φημί","φῄς","φησί|φησίν","φατόν","φατόν","φαμέν","φατέ","φασί|φασίν"]},
+ {lemma:"φημί", gloss:"говорить, утверждать", group:"irr", lvl:4, tense:"Imperfectum Act.",
+  f:["ἔφην","ἔφησθα|ἔφης","ἔφη","ἔφατον","ἐφάτην","ἔφαμεν","ἔφατε","ἔφασαν"]},
+ {lemma:"οἶδα", gloss:"знать (perf. в знач. praes.)", group:"irr", lvl:4, tense:"Perfectum (praes.)",
+  f:["οἶδα","οἶσθα","οἶδε|οἶδεν","ἴστον","ἴστον","ἴσμεν","ἴστε","ἴσασι|ἴσασιν"]},
+/* ── εἰμί ── */
+ {lemma:"εἰμί", gloss:"быть", group:"eimi", lvl:1, tense:"Praesens",
+  f:["εἰμί","εἶ","ἐστί|ἐστίν","ἐστόν","ἐστόν","ἐσμέν","ἐστέ","εἰσί|εἰσίν"]},
+ {lemma:"εἰμί", gloss:"быть", group:"eimi", lvl:2, tense:"Imperfectum",
+  f:["ἦν|ἦ","ἦσθα","ἦν","ἦστον","ἤστην","ἦμεν","ἦτε","ἦσαν"]},
+ {lemma:"εἰμί", gloss:"быть", group:"eimi", lvl:2, tense:"Futurum (med.)",
+  f:["ἔσομαι","ἔσῃ|ἔσει","ἔσται","ἔσεσθον","ἔσεσθον","ἐσόμεθα","ἔσεσθε","ἔσονται"]},
+/* ── Coniunctivus ── */
+ {lemma:"λύω", gloss:"развязывать", group:"coni", lvl:3, tense:"Coni. Praes. Act.",
+  f:["λύω","λύῃς","λύῃ","λύητον","λύητον","λύωμεν","λύητε","λύωσι|λύωσιν"]},
+ {lemma:"λύω", gloss:"развязывать", group:"coni", lvl:3, tense:"Coni. Aor. Act.",
+  f:["λύσω","λύσῃς","λύσῃ","λύσητον","λύσητον","λύσωμεν","λύσητε","λύσωσι|λύσωσιν"]},
+ {lemma:"λύω", gloss:"развязывать", group:"coni", lvl:3, tense:"Coni. Praes. Med.-Pass.",
+  f:["λύωμαι","λύῃ","λύηται","λύησθον","λύησθον","λυώμεθα","λύησθε","λύωνται"]},
+ {lemma:"λύω", gloss:"развязывать", group:"coni", lvl:3, tense:"Coni. Aor. Pass.",
+  f:["λυθῶ","λυθῇς","λυθῇ","λυθῆτον","λυθῆτον","λυθῶμεν","λυθῆτε","λυθῶσι|λυθῶσιν"]},
+ {lemma:"λείπω", gloss:"оставлять", group:"coni", lvl:3, tense:"Coni. Aor. II Act.",
+  f:["λίπω","λίπῃς","λίπῃ","λίπητον","λίπητον","λίπωμεν","λίπητε","λίπωσι|λίπωσιν"]},
+ {lemma:"εἰμί", gloss:"быть", group:"coni", lvl:3, tense:"Coni. Praes.",
+  f:["ὦ","ᾖς","ᾖ","ἦτον","ἦτον","ὦμεν","ἦτε","ὦσι|ὦσιν"]},
+ {lemma:"τίθημι", gloss:"класть", group:"coni", lvl:4, tense:"Coni. Praes. Act.",
+  f:["τιθῶ","τιθῇς","τιθῇ","τιθῆτον","τιθῆτον","τιθῶμεν","τιθῆτε","τιθῶσι|τιθῶσιν"]},
+ {lemma:"δίδωμι", gloss:"давать", group:"coni", lvl:4, tense:"Coni. Praes. Act.",
+  f:["διδῶ","διδῷς","διδῷ","διδῶτον","διδῶτον","διδῶμεν","διδῶτε","διδῶσι|διδῶσιν"]},
+ {lemma:"τίθημι", gloss:"класть", group:"coni", lvl:4, tense:"Coni. Aor. Act.",
+  f:["θῶ","θῇς","θῇ","θῆτον","θῆτον","θῶμεν","θῆτε","θῶσι|θῶσιν"]},
+ {lemma:"δίδωμι", gloss:"давать", group:"coni", lvl:4, tense:"Coni. Aor. Act.",
+  f:["δῶ","δῷς","δῷ","δῶτον","δῶτον","δῶμεν","δῶτε","δῶσι|δῶσιν"]},
+ {lemma:"γιγνώσκω", gloss:"узнавать", group:"coni", lvl:4, tense:"Coni. Aor. (корневой)",
+  f:["γνῶ","γνῷς","γνῷ","γνῶτον","γνῶτον","γνῶμεν","γνῶτε","γνῶσι|γνῶσιν"]},
+ {lemma:"ἵστημι", gloss:"становиться (ἔστην)", group:"coni", lvl:4, tense:"Coni. Aor. (корневой)",
+  f:["στῶ","στῇς","στῇ","στῆτον","στῆτον","στῶμεν","στῆτε","στῶσι|στῶσιν"]},
+/* ── Optativus ── */
+ {lemma:"λύω", gloss:"развязывать", group:"opt", lvl:3, tense:"Opt. Praes. Act.",
+  f:["λύοιμι","λύοις","λύοι","λύοιτον","λυοίτην","λύοιμεν","λύοιτε","λύοιεν"]},
+ {lemma:"λύω", gloss:"развязывать", group:"opt", lvl:3, tense:"Opt. Fut. Act.",
+  f:["λύσοιμι","λύσοις","λύσοι","λύσοιτον","λυσοίτην","λύσοιμεν","λύσοιτε","λύσοιεν"]},
+ {lemma:"λύω", gloss:"развязывать", group:"opt", lvl:3, tense:"Opt. Aor. Act.",
+  f:["λύσαιμι","λύσαις|λύσειας","λύσαι|λύσειε|λύσειεν","λύσαιτον","λυσαίτην","λύσαιμεν","λύσαιτε","λύσαιεν|λύσειαν"]},
+ {lemma:"λύω", gloss:"развязывать", group:"opt", lvl:3, tense:"Opt. Praes. Med.-Pass.",
+  f:["λυοίμην","λύοιο","λύοιτο","λύοισθον","λυοίσθην","λυοίμεθα","λύοισθε","λύοιντο"]},
+ {lemma:"λύω", gloss:"развязывать", group:"opt", lvl:3, tense:"Opt. Aor. Pass.",
+  f:["λυθείην","λυθείης","λυθείη","λυθεῖτον|λυθείητον","λυθείτην|λυθειήτην","λυθεῖμεν|λυθείημεν","λυθεῖτε|λυθείητε","λυθεῖεν|λυθείησαν"]},
+ {lemma:"λείπω", gloss:"оставлять", group:"opt", lvl:3, tense:"Opt. Aor. II Act.",
+  f:["λίποιμι","λίποις","λίποι","λίποιτον","λιποίτην","λίποιμεν","λίποιτε","λίποιεν"]},
+ {lemma:"τιμάω", gloss:"почитать", group:"opt", lvl:4, tense:"Opt. Praes. Act. (contr.)",
+  f:["τιμῴην","τιμῴης","τιμῴη","τιμῷτον","τιμῴτην","τιμῷμεν","τιμῷτε","τιμῷεν"]},
+ {lemma:"εἰμί", gloss:"быть", group:"opt", lvl:3, tense:"Opt. Praes.",
+  f:["εἴην","εἴης","εἴη","εἶτον|εἴητον","εἴτην|εἰήτην","εἶμεν|εἴημεν","εἶτε|εἴητε","εἶεν|εἴησαν"]},
+ {lemma:"δίδωμι", gloss:"давать", group:"opt", lvl:4, tense:"Opt. Aor. Act.",
+  f:["δοίην","δοίης","δοίη","δοῖτον","δοίτην","δοῖμεν","δοῖτε","δοῖεν"]},
+ {lemma:"τίθημι", gloss:"класть", group:"opt", lvl:4, tense:"Opt. Aor. Act.",
+  f:["θείην","θείης","θείη","θεῖτον","θείτην","θεῖμεν","θεῖτε","θεῖεν"]},
+/* ── Imperativus (без 1-го лица) ── */
+ {lemma:"λύω", gloss:"развязывать", group:"imper", lvl:3, tense:"Imperat. Praes. Act.",
+  f:[null,"λῦε","λυέτω","λύετον","λυέτων",null,"λύετε","λυόντων|λυέτωσαν"]},
+ {lemma:"λύω", gloss:"развязывать", group:"imper", lvl:3, tense:"Imperat. Aor. Act.",
+  f:[null,"λῦσον","λυσάτω","λύσατον","λυσάτων",null,"λύσατε","λυσάντων|λυσάτωσαν"]},
+ {lemma:"λύω", gloss:"развязывать", group:"imper", lvl:3, tense:"Imperat. Praes. Med.-Pass.",
+  f:[null,"λύου","λυέσθω","λύεσθον","λυέσθων",null,"λύεσθε","λυέσθων|λυέσθωσαν"]},
+ {lemma:"λύω", gloss:"развязывать", group:"imper", lvl:3, tense:"Imperat. Aor. Med.",
+  f:[null,"λῦσαι","λυσάσθω","λύσασθον","λυσάσθων",null,"λύσασθε","λυσάσθων|λυσάσθωσαν"]},
+ {lemma:"λύω", gloss:"развязывать", group:"imper", lvl:3, tense:"Imperat. Aor. Pass.",
+  f:[null,"λύθητι","λυθήτω","λύθητον","λυθήτων",null,"λύθητε","λυθέντων|λυθήτωσαν"]},
+ {lemma:"λείπω", gloss:"оставлять", group:"imper", lvl:3, tense:"Imperat. Aor. II Act.",
+  f:[null,"λίπε","λιπέτω","λίπετον","λιπέτων",null,"λίπετε","λιπόντων"]},
+ {lemma:"λαμβάνω", gloss:"брать (окситон λαβέ!)", group:"imper", lvl:3, tense:"Imperat. Aor. II Act.",
+  f:[null,"λαβέ","λαβέτω","λάβετον","λαβέτων",null,"λάβετε","λαβόντων"]},
+ {lemma:"εἰμί", gloss:"быть", group:"imper", lvl:3, tense:"Imperat. Praes.",
+  f:[null,"ἴσθι","ἔστω","ἔστον","ἔστων",null,"ἔστε","ἔστων|ὄντων|ἔστωσαν"]},
+ {lemma:"δίδωμι", gloss:"давать", group:"imper", lvl:4, tense:"Imperat. Aor. Act.",
+  f:[null,"δός","δότω","δότον","δότων",null,"δότε","δόντων"]},
+ {lemma:"τίθημι", gloss:"класть", group:"imper", lvl:4, tense:"Imperat. Aor. Act.",
+  f:[null,"θές","θέτω","θέτον","θέτων",null,"θέτε","θέντων"]},
+ {lemma:"ἵστημι", gloss:"становиться", group:"imper", lvl:4, tense:"Imperat. Aor. (корневой)",
+  f:[null,"στῆθι","στήτω","στῆτον","στήτων",null,"στῆτε","στάντων"]},
+ {lemma:"γιγνώσκω", gloss:"узнавать (γνῶθι σεαυτόν)", group:"imper", lvl:4, tense:"Imperat. Aor. (корневой)",
+  f:[null,"γνῶθι","γνώτω","γνῶτον","γνώτων",null,"γνῶτε","γνόντων"]},
+/* ── Infinitivi (слоты — времена) ── */
+ {lemma:"λύω", gloss:"развязывать", group:"inf", lvl:3, tense:"Inf.",
+  labels:["Praes. act.","Fut. act.","Aor. act.","Perf. act.","Praes. med.-pass.","Fut. med.","Aor. med.","Aor. pass."],
+  f:["λύειν","λύσειν","λῦσαι","λελυκέναι","λύεσθαι","λύσεσθαι","λύσασθαι","λυθῆναι"]},
+ {lemma:"παιδεύω", gloss:"воспитывать", group:"inf", lvl:3, tense:"Inf.",
+  labels:["Praes. act.","Fut. act.","Aor. act.","Perf. act.","Praes. med.-pass.","Fut. med.","Aor. med.","Aor. pass."],
+  f:["παιδεύειν","παιδεύσειν","παιδεῦσαι","πεπαιδευκέναι","παιδεύεσθαι","παιδεύσεσθαι","παιδεύσασθαι","παιδευθῆναι"]},
+ {lemma:"γράφω", gloss:"писать", group:"inf", lvl:3, tense:"Inf.",
+  labels:["Praes. act.","Fut. act.","Aor. act.","Perf. act.","Praes. med.-pass.","Fut. med.","Aor. med.","Aor. II pass."],
+  f:["γράφειν","γράψειν","γράψαι","γεγραφέναι","γράφεσθαι","γράψεσθαι","γράψασθαι","γραφῆναι"]},
+ {lemma:"λείπω", gloss:"оставлять", group:"inf", lvl:3, tense:"Inf.",
+  labels:["Praes. act.","Fut. act.","Aor. II act.","Perf. act.","Praes. med.-pass.","Fut. med.","Aor. II med.","Aor. pass."],
+  f:["λείπειν","λείψειν","λιπεῖν","λελοιπέναι","λείπεσθαι","λείψεσθαι","λιπέσθαι","λειφθῆναι"]},
+ {lemma:"τίθημι", gloss:"класть", group:"inf", lvl:4, tense:"Inf.",
+  labels:["Praes. act.","Fut. act.","Aor. act.",null,"Praes. med.-pass.","Fut. med.","Aor. med.","Aor. pass."],
+  f:["τιθέναι","θήσειν","θεῖναι",null,"τίθεσθαι","θήσεσθαι","θέσθαι","τεθῆναι"]},
+ {lemma:"δίδωμι", gloss:"давать", group:"inf", lvl:4, tense:"Inf.",
+  labels:["Praes. act.","Fut. act.","Aor. act.","Perf. act.","Praes. med.-pass.","Fut. med.","Aor. med.","Aor. pass."],
+  f:["διδόναι","δώσειν","δοῦναι","δεδωκέναι","δίδοσθαι","δώσεσθαι","δόσθαι","δοθῆναι"]},
+/* ── Plusquamperfectum ── */
+ {lemma:"λύω", gloss:"развязывать", group:"plqp", lvl:4, tense:"Plusquamperf. Act.",
+  f:["ἐλελύκη|ἐλελύκειν","ἐλελύκης|ἐλελύκεις","ἐλελύκει|ἐλελύκειν","ἐλελύκετον","ἐλελυκέτην","ἐλελύκεμεν","ἐλελύκετε","ἐλελύκεσαν"]},
+ {lemma:"παιδεύω", gloss:"воспитывать", group:"plqp", lvl:4, tense:"Plusquamperf. Act.",
+  f:["ἐπεπαιδεύκη|ἐπεπαιδεύκειν","ἐπεπαιδεύκης|ἐπεπαιδεύκεις","ἐπεπαιδεύκει|ἐπεπαιδεύκειν","ἐπεπαιδεύκετον","ἐπεπαιδευκέτην","ἐπεπαιδεύκεμεν","ἐπεπαιδεύκετε","ἐπεπαιδεύκεσαν"]},
+ {lemma:"κομίζω", gloss:"приносить", group:"plqp", lvl:4, tense:"Plusquamperf. Act.",
+  f:["ἐκεκομίκη|ἐκεκομίκειν","ἐκεκομίκης|ἐκεκομίκεις","ἐκεκομίκει|ἐκεκομίκειν","ἐκεκομίκετον","ἐκεκομικέτην","ἐκεκομίκεμεν","ἐκεκομίκετε","ἐκεκομίκεσαν"]},
+ {lemma:"λύω", gloss:"развязывать", group:"plqp", lvl:4, tense:"Plusquamperf. Med.-Pass.",
+  f:["ἐλελύμην","ἐλέλυσο","ἐλέλυτο","ἐλέλυσθον","ἐλελύσθην","ἐλελύμεθα","ἐλέλυσθε","ἐλέλυντο"]},
+/* ── Verba deponentia (аорист) ── */
+ {lemma:"δύναμαι", gloss:"мочь (dep. passivum)", group:"depP", lvl:3, tense:"Aoristus Pass. (dep.)",
+  f:["ἐδυνήθην","ἐδυνήθης","ἐδυνήθη","ἐδυνήθητον","ἐδυνηθήτην","ἐδυνήθημεν","ἐδυνήθητε","ἐδυνήθησαν"]},
+ {lemma:"βούλομαι", gloss:"хотеть (dep. passivum)", group:"depP", lvl:3, tense:"Aoristus Pass. (dep.)",
+  f:["ἐβουλήθην","ἐβουλήθης","ἐβουλήθη","ἐβουλήθητον","ἐβουληθήτην","ἐβουλήθημεν","ἐβουλήθητε","ἐβουλήθησαν"]},
+ {lemma:"ἥδομαι", gloss:"радоваться (dep. passivum)", group:"depP", lvl:3, tense:"Aoristus Pass. (dep.)",
+  f:["ἥσθην","ἥσθης","ἥσθη","ἥσθητον","ἡσθήτην","ἥσθημεν","ἥσθητε","ἥσθησαν"]},
+ {lemma:"ὀργίζομαι", gloss:"сердиться (dep. passivum)", group:"depP", lvl:3, tense:"Aoristus Pass. (dep.)",
+  f:["ὠργίσθην","ὠργίσθης","ὠργίσθη","ὠργίσθητον","ὠργισθήτην","ὠργίσθημεν","ὠργίσθητε","ὠργίσθησαν"]},
+ {lemma:"φοβέομαι", gloss:"бояться (dep. passivum)", group:"depP", lvl:3, tense:"Aoristus Pass. (dep.)",
+  f:["ἐφοβήθην","ἐφοβήθης","ἐφοβήθη","ἐφοβήθητον","ἐφοβηθήτην","ἐφοβήθημεν","ἐφοβήθητε","ἐφοβήθησαν"]},
+ {lemma:"πορεύομαι", gloss:"отправляться (dep. passivum)", group:"depP", lvl:3, tense:"Aoristus Pass. (dep.)",
+  f:["ἐπορεύθην","ἐπορεύθης","ἐπορεύθη","ἐπορεύθητον","ἐπορευθήτην","ἐπορεύθημεν","ἐπορεύθητε","ἐπορεύθησαν"]},
+ {lemma:"δέχομαι", gloss:"принимать (dep. medium — контраст)", group:"depP", lvl:3, tense:"Aoristus Med. (dep.)",
+  f:["ἐδεξάμην","ἐδέξω","ἐδέξατο","ἐδέξασθον","ἐδεξάσθην","ἐδεξάμεθα","ἐδέξασθε","ἐδέξαντο"]},
+/* ── Homerus — режим Ω ── */
+ {lemma:"εἰμί", gloss:"быть (гомер.)", group:"hom", lvl:5, tense:"Praesens (Hom.)",
+  f:["εἰμί","ἐσσί|εἶς","ἐστί|ἐστίν","ἐστόν","ἐστόν","εἰμέν","ἐστέ","εἰσί|εἰσίν|ἔασι|ἔασιν"]},
+ {lemma:"λύω", gloss:"развязывать (аорист без приращения)", group:"hom", lvl:5, tense:"Aoristus sine augmento (Hom.)",
+  f:["λῦσα","λῦσας","λῦσε|λῦσεν","λύσατον","λυσάτην","λύσαμεν","λύσατε","λῦσαν"]},
+ {lemma:"βούλομαι", gloss:"хотеть (гомер., без слияния)", group:"hom", lvl:5, tense:"Praesens Med. (Hom.)",
+  f:["βούλομαι","βούλεαι","βούλεται","βούλεσθον","βούλεσθον","βουλόμεθα|βουλόμεσθα","βούλεσθε","βούλονται"]},
+];
+
+/* Причастия: по родам; sg/pl = [Nom, Gen, Dat, Acc], du = [Nom.Acc., Gen.Dat.] */
+const PTC = [
+ {lemma:"λύων, λύουσα, λῦον", base:"λύω", gloss:"развязывающий", group:"pPraes", tense:"Part. praes. act.",
+  m:{sg:["λύων","λύοντος","λύοντι","λύοντα"], pl:["λύοντες","λυόντων","λύουσι|λύουσιν","λύοντας"], du:["λύοντε","λυόντοιν"]},
+  f:{sg:["λύουσα","λυούσης","λυούσῃ","λύουσαν"], pl:["λύουσαι","λυουσῶν","λυούσαις","λυούσας"], du:["λυούσα","λυούσαιν"]},
+  n:{sg:["λῦον","λύοντος","λύοντι","λῦον"], pl:["λύοντα","λυόντων","λύουσι|λύουσιν","λύοντα"], du:["λύοντε","λυόντοιν"]}},
+ {lemma:"ὤν, οὖσα, ὄν", base:"εἰμί", gloss:"сущий", group:"pPraes", tense:"Part. praes. (εἰμί)",
+  m:{sg:["ὤν","ὄντος","ὄντι","ὄντα"], pl:["ὄντες","ὄντων","οὖσι|οὖσιν","ὄντας"], du:["ὄντε","ὄντοιν"]},
+  f:{sg:["οὖσα","οὔσης","οὔσῃ","οὖσαν"], pl:["οὖσαι","οὐσῶν","οὔσαις","οὔσας"], du:["οὔσα","οὔσαιν"]},
+  n:{sg:["ὄν","ὄντος","ὄντι","ὄν"], pl:["ὄντα","ὄντων","οὖσι|οὖσιν","ὄντα"], du:["ὄντε","ὄντοιν"]}},
+ {lemma:"λύσας, λύσασα, λῦσαν", base:"λύω", gloss:"развязавший", group:"pAor", tense:"Part. aor. act.",
+  m:{sg:["λύσας","λύσαντος","λύσαντι","λύσαντα"], pl:["λύσαντες","λυσάντων","λύσασι|λύσασιν","λύσαντας"], du:["λύσαντε","λυσάντοιν"]},
+  f:{sg:["λύσασα","λυσάσης","λυσάσῃ","λύσασαν"], pl:["λύσασαι","λυσασῶν","λυσάσαις","λυσάσας"], du:["λυσάσα","λυσάσαιν"]},
+  n:{sg:["λῦσαν","λύσαντος","λύσαντι","λῦσαν"], pl:["λύσαντα","λυσάντων","λύσασι|λύσασιν","λύσαντα"], du:["λύσαντε","λυσάντοιν"]}},
+ {lemma:"λυθείς, λυθεῖσα, λυθέν", base:"λύω", gloss:"развязанный (aor.)", group:"pAorP", tense:"Part. aor. pass.",
+  m:{sg:["λυθείς","λυθέντος","λυθέντι","λυθέντα"], pl:["λυθέντες","λυθέντων","λυθεῖσι|λυθεῖσιν","λυθέντας"], du:["λυθέντε","λυθέντοιν"]},
+  f:{sg:["λυθεῖσα","λυθείσης","λυθείσῃ","λυθεῖσαν"], pl:["λυθεῖσαι","λυθεισῶν","λυθείσαις","λυθείσας"], du:["λυθείσα","λυθείσαιν"]},
+  n:{sg:["λυθέν","λυθέντος","λυθέντι","λυθέν"], pl:["λυθέντα","λυθέντων","λυθεῖσι|λυθεῖσιν","λυθέντα"], du:["λυθέντε","λυθέντοιν"]}},
+ {lemma:"λελυκώς, λελυκυῖα, λελυκός", base:"λύω", gloss:"развязавший (perf.)", group:"pPerf", tense:"Part. perf. act.",
+  m:{sg:["λελυκώς","λελυκότος","λελυκότι","λελυκότα"], pl:["λελυκότες","λελυκότων","λελυκόσι|λελυκόσιν","λελυκότας"], du:["λελυκότε","λελυκότοιν"]},
+  f:{sg:["λελυκυῖα","λελυκυίας","λελυκυίᾳ","λελυκυῖαν"], pl:["λελυκυῖαι","λελυκυιῶν","λελυκυίαις","λελυκυίας"], du:["λελυκυία","λελυκυίαιν"]},
+  n:{sg:["λελυκός","λελυκότος","λελυκότι","λελυκός"], pl:["λελυκότα","λελυκότων","λελυκόσι|λελυκόσιν","λελυκότα"], du:["λελυκότε","λελυκότοιν"]}},
+ {lemma:"λελυμένος, λελυμένη, λελυμένον", base:"λύω", gloss:"развязанный (perf.)", group:"pPerf", tense:"Part. perf. med.-pass.",
+  m:{sg:["λελυμένος","λελυμένου","λελυμένῳ","λελυμένον"], pl:["λελυμένοι","λελυμένων","λελυμένοις","λελυμένους"], du:["λελυμένω","λελυμένοιν"]},
+  f:{sg:["λελυμένη","λελυμένης","λελυμένῃ","λελυμένην"], pl:["λελυμέναι","λελυμένων","λελυμέναις","λελυμένας"], du:["λελυμένα","λελυμέναιν"]},
+  n:{sg:["λελυμένον","λελυμένου","λελυμένῳ","λελυμένον"], pl:["λελυμένα","λελυμένων","λελυμένοις","λελυμένα"], du:["λελυμένω","λελυμένοιν"]}},
+ {lemma:"λυόμενος, λυομένη, λυόμενον", base:"λύω", gloss:"развязываемый", group:"pMP", tense:"Part. praes. med.-pass.",
+  m:{sg:["λυόμενος","λυομένου","λυομένῳ","λυόμενον"], pl:["λυόμενοι","λυομένων","λυομένοις","λυομένους"], du:["λυομένω","λυομένοιν"]},
+  f:{sg:["λυομένη","λυομένης","λυομένῃ","λυομένην"], pl:["λυόμεναι","λυομένων","λυομέναις","λυομένας"], du:["λυομένα","λυομέναιν"]},
+  n:{sg:["λυόμενον","λυομένου","λυομένῳ","λυόμενον"], pl:["λυόμενα","λυομένων","λυομένοις","λυόμενα"], du:["λυομένω","λυομένοιν"]}},
+];
+
+const NOUN_GROUPS = [
+  {id:"d1", label:"I скл. (ᾱ)"},
+  {id:"d2", label:"II скл. (ο)"},
+  {id:"d3", label:"III скл."},
+  {id:"hom", label:"Ὅμηρος Ω"},
+];
+const VERB_GROUPS = [
+  {id:"praes", label:"Praesens"},
+  {id:"impf", label:"Imperfectum"},
+  {id:"fut", label:"Futurum"},
+  {id:"futM", label:"Fut. medii"},
+  {id:"aor", label:"Aoristus I"},
+  {id:"aorL", label:"Aor. I liquida"},
+  {id:"aor2", label:"Aoristus II"},
+  {id:"aorR", label:"Aor. корневой"},
+  {id:"aorP", label:"Aor. I pass."},
+  {id:"aorP2", label:"Aor. II pass."},
+  {id:"futP", label:"Fut. passivi"},
+  {id:"perf", label:"Perfectum"},
+  {id:"perfMP", label:"Perf. med.-pass."},
+  {id:"mp", label:"Praes. med.-pass."},
+  {id:"contr", label:"Verba contracta"},
+  {id:"mi", label:"Глаголы на -μι"},
+  {id:"irr", label:"εἶμι, φημί, οἶδα"},
+  {id:"eimi", label:"εἰμί"},
+  {id:"coni", label:"Coniunctivus"},
+  {id:"opt", label:"Optativus"},
+  {id:"imper", label:"Imperativus"},
+  {id:"inf", label:"Infinitivi"},
+  {id:"plqp", label:"Plusquamperf."},
+  {id:"depP", label:"Deponentia (aor.)"},
+  {id:"hom", label:"Ὅμηρος Ω"},
+];
+const PTC_GROUPS = [
+  {id:"pPraes", label:"Praes. act."},
+  {id:"pAor", label:"Aor. act."},
+  {id:"pAorP", label:"Aor. pass."},
+  {id:"pPerf", label:"Perfectum"},
+  {id:"pMP", label:"Med.-Pass."},
+];
+
+/* Прилагательные: 3-родовые — как причастия (du необязателен);
+   степени сравнения — ряды с именованными слотами */
+const ADJ = [
+ {lemma:"ἀγαθός, ἀγαθή, ἀγαθόν", gloss:"хороший", group:"a12", lvl:1, tense:"Adi. 1–2 скл.",
+  m:{sg:["ἀγαθός","ἀγαθοῦ","ἀγαθῷ","ἀγαθόν"], pl:["ἀγαθοί","ἀγαθῶν","ἀγαθοῖς","ἀγαθούς"], du:["ἀγαθώ","ἀγαθοῖν"]},
+  f:{sg:["ἀγαθή","ἀγαθῆς","ἀγαθῇ","ἀγαθήν"], pl:["ἀγαθαί","ἀγαθῶν","ἀγαθαῖς","ἀγαθάς"], du:["ἀγαθά","ἀγαθαῖν"]},
+  n:{sg:["ἀγαθόν","ἀγαθοῦ","ἀγαθῷ","ἀγαθόν"], pl:["ἀγαθά","ἀγαθῶν","ἀγαθοῖς","ἀγαθά"], du:["ἀγαθώ","ἀγαθοῖν"]}},
+ {lemma:"ἄξιος, ἀξία, ἄξιον", gloss:"достойный (fem. на ᾱ)", group:"a12", lvl:2, tense:"Adi. 1–2 скл.",
+  m:{sg:["ἄξιος","ἀξίου","ἀξίῳ","ἄξιον"], pl:["ἄξιοι","ἀξίων","ἀξίοις","ἀξίους"], du:["ἀξίω","ἀξίοιν"]},
+  f:{sg:["ἀξία","ἀξίας","ἀξίᾳ","ἀξίαν"], pl:["ἄξιαι","ἀξίων","ἀξίαις","ἀξίας"], du:["ἀξία","ἀξίαιν"]},
+  n:{sg:["ἄξιον","ἀξίου","ἀξίῳ","ἄξιον"], pl:["ἄξια","ἀξίων","ἀξίοις","ἄξια"], du:["ἀξίω","ἀξίοιν"]}},
+ {lemma:"ἄδικος, ἄδικον", gloss:"несправедливый (два окончания)", group:"a2", lvl:2, tense:"Adi. двух оконч.",
+  m:{sg:["ἄδικος","ἀδίκου","ἀδίκῳ","ἄδικον"], pl:["ἄδικοι","ἀδίκων","ἀδίκοις","ἀδίκους"], du:["ἀδίκω","ἀδίκοιν"]},
+  f:{sg:["ἄδικος","ἀδίκου","ἀδίκῳ","ἄδικον"], pl:["ἄδικοι","ἀδίκων","ἀδίκοις","ἀδίκους"], du:["ἀδίκω","ἀδίκοιν"]},
+  n:{sg:["ἄδικον","ἀδίκου","ἀδίκῳ","ἄδικον"], pl:["ἄδικα","ἀδίκων","ἀδίκοις","ἄδικα"], du:["ἀδίκω","ἀδίκοιν"]}},
+ {lemma:"ἀληθής, ἀληθές", gloss:"истинный (основа на σ)", group:"a3", lvl:3, tense:"Adi. III скл.",
+  m:{sg:["ἀληθής","ἀληθοῦς","ἀληθεῖ","ἀληθῆ"], pl:["ἀληθεῖς","ἀληθῶν","ἀληθέσι|ἀληθέσιν","ἀληθεῖς"], du:["ἀληθεῖ","ἀληθοῖν"]},
+  f:{sg:["ἀληθής","ἀληθοῦς","ἀληθεῖ","ἀληθῆ"], pl:["ἀληθεῖς","ἀληθῶν","ἀληθέσι|ἀληθέσιν","ἀληθεῖς"], du:["ἀληθεῖ","ἀληθοῖν"]},
+  n:{sg:["ἀληθές","ἀληθοῦς","ἀληθεῖ","ἀληθές"], pl:["ἀληθῆ","ἀληθῶν","ἀληθέσι|ἀληθέσιν","ἀληθῆ"], du:["ἀληθεῖ","ἀληθοῖν"]}},
+ {lemma:"εὐδαίμων, εὔδαιμον", gloss:"счастливый (основа на ν)", group:"a3", lvl:3, tense:"Adi. III скл.",
+  m:{sg:["εὐδαίμων","εὐδαίμονος","εὐδαίμονι","εὐδαίμονα"], pl:["εὐδαίμονες","εὐδαιμόνων","εὐδαίμοσι|εὐδαίμοσιν","εὐδαίμονας"], du:["εὐδαίμονε","εὐδαιμόνοιν"]},
+  f:{sg:["εὐδαίμων","εὐδαίμονος","εὐδαίμονι","εὐδαίμονα"], pl:["εὐδαίμονες","εὐδαιμόνων","εὐδαίμοσι|εὐδαίμοσιν","εὐδαίμονας"], du:["εὐδαίμονε","εὐδαιμόνοιν"]},
+  n:{sg:["εὔδαιμον","εὐδαίμονος","εὐδαίμονι","εὔδαιμον"], pl:["εὐδαίμονα","εὐδαιμόνων","εὐδαίμοσι|εὐδαίμοσιν","εὐδαίμονα"], du:["εὐδαίμονε","εὐδαιμόνοιν"]}},
+ {lemma:"ἡδύς, ἡδεῖα, ἡδύ", gloss:"приятный (основа на υ)", group:"a3", lvl:3, tense:"Adi. III скл.",
+  m:{sg:["ἡδύς","ἡδέος","ἡδεῖ","ἡδύν"], pl:["ἡδεῖς","ἡδέων","ἡδέσι|ἡδέσιν","ἡδεῖς"], du:["ἡδέε","ἡδέοιν"]},
+  f:{sg:["ἡδεῖα","ἡδείας","ἡδείᾳ","ἡδεῖαν"], pl:["ἡδεῖαι","ἡδειῶν","ἡδείαις","ἡδείας"], du:["ἡδεία","ἡδείαιν"]},
+  n:{sg:["ἡδύ","ἡδέος","ἡδεῖ","ἡδύ"], pl:["ἡδέα","ἡδέων","ἡδέσι|ἡδέσιν","ἡδέα"], du:["ἡδέε","ἡδέοιν"]}},
+ {lemma:"πᾶς, πᾶσα, πᾶν", gloss:"весь, всякий", group:"irrA", lvl:3, tense:"Adi. (πᾶς)",
+  m:{sg:["πᾶς","παντός","παντί","πάντα"], pl:["πάντες","πάντων","πᾶσι|πᾶσιν","πάντας"]},
+  f:{sg:["πᾶσα","πάσης","πάσῃ","πᾶσαν"], pl:["πᾶσαι","πασῶν","πάσαις","πάσας"]},
+  n:{sg:["πᾶν","παντός","παντί","πᾶν"], pl:["πάντα","πάντων","πᾶσι|πᾶσιν","πάντα"]}},
+ {lemma:"μέγας, μεγάλη, μέγα", gloss:"большой", group:"irrA", lvl:3, tense:"Adi. (μέγας)",
+  m:{sg:["μέγας","μεγάλου","μεγάλῳ","μέγαν"], pl:["μεγάλοι","μεγάλων","μεγάλοις","μεγάλους"], du:["μεγάλω","μεγάλοιν"]},
+  f:{sg:["μεγάλη","μεγάλης","μεγάλῃ","μεγάλην"], pl:["μεγάλαι","μεγάλων","μεγάλαις","μεγάλας"], du:["μεγάλα","μεγάλαιν"]},
+  n:{sg:["μέγα","μεγάλου","μεγάλῳ","μέγα"], pl:["μεγάλα","μεγάλων","μεγάλοις","μεγάλα"], du:["μεγάλω","μεγάλοιν"]}},
+ {lemma:"πολύς, πολλή, πολύ", gloss:"многий", group:"irrA", lvl:3, tense:"Adi. (πολύς)",
+  m:{sg:["πολύς","πολλοῦ","πολλῷ","πολύν"], pl:["πολλοί","πολλῶν","πολλοῖς","πολλούς"]},
+  f:{sg:["πολλή","πολλῆς","πολλῇ","πολλήν"], pl:["πολλαί","πολλῶν","πολλαῖς","πολλάς"]},
+  n:{sg:["πολύ","πολλοῦ","πολλῷ","πολύ"], pl:["πολλά","πολλῶν","πολλοῖς","πολλά"]}},
+ {lemma:"μείζων, μεῖζον", gloss:"больший (склонение сравнит.)", group:"compD", lvl:3, tense:"Comparativus (скл.)",
+  m:{sg:["μείζων","μείζονος","μείζονι","μείζονα|μείζω"], pl:["μείζονες|μείζους","μειζόνων","μείζοσι|μείζοσιν","μείζονας|μείζους"], du:["μείζονε","μειζόνοιν"]},
+  f:{sg:["μείζων","μείζονος","μείζονι","μείζονα|μείζω"], pl:["μείζονες|μείζους","μειζόνων","μείζοσι|μείζοσιν","μείζονας|μείζους"], du:["μείζονε","μειζόνοιν"]},
+  n:{sg:["μεῖζον","μείζονος","μείζονι","μεῖζον"], pl:["μείζονα|μείζω","μειζόνων","μείζοσι|μείζοσιν","μείζονα|μείζω"], du:["μείζονε","μειζόνοιν"]}},
+/* ── Степени сравнения (ряды) ── */
+ {lemma:"σοφός", gloss:"мудрый (краткий предшеств. слог → ω)", group:"grad", lvl:2, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["σοφός","σοφώτερος","σοφώτατος",null,null,null,null,null]},
+ {lemma:"δεινός", gloss:"страшный, искусный (долгий слог → ο)", group:"grad", lvl:2, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["δεινός","δεινότερος","δεινότατος",null,null,null,null,null]},
+ {lemma:"δίκαιος", gloss:"справедливый", group:"grad", lvl:2, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["δίκαιος","δικαιότερος","δικαιότατος",null,null,null,null,null]},
+ {lemma:"ἀληθής", gloss:"истинный", group:"grad", lvl:2, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["ἀληθής","ἀληθέστερος","ἀληθέστατος",null,null,null,null,null]},
+ {lemma:"εὐδαίμων", gloss:"счастливый", group:"grad", lvl:2, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["εὐδαίμων","εὐδαιμονέστερος","εὐδαιμονέστατος",null,null,null,null,null]},
+ {lemma:"ἡδύς", gloss:"приятный", group:"grad", lvl:3, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["ἡδύς","ἡδίων","ἥδιστος",null,null,null,null,null]},
+ {lemma:"ταχύς", gloss:"быстрый", group:"grad", lvl:3, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["ταχύς","θάττων","τάχιστος",null,null,null,null,null]},
+ {lemma:"καλός", gloss:"прекрасный", group:"grad", lvl:3, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["καλός","καλλίων","κάλλιστος",null,null,null,null,null]},
+ {lemma:"ἀγαθός", gloss:"хороший (супплетивно)", group:"grad", lvl:3, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["ἀγαθός","ἀμείνων|βελτίων|κρείττων","ἄριστος|βέλτιστος|κράτιστος",null,null,null,null,null]},
+ {lemma:"κακός", gloss:"дурной (супплетивно)", group:"grad", lvl:3, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["κακός","κακίων|χείρων","κάκιστος|χείριστος",null,null,null,null,null]},
+ {lemma:"μέγας", gloss:"большой (супплетивно)", group:"grad", lvl:3, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["μέγας","μείζων","μέγιστος",null,null,null,null,null]},
+ {lemma:"πολύς", gloss:"многий (супплетивно)", group:"grad", lvl:3, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["πολύς","πλείων|πλέων","πλεῖστος",null,null,null,null,null]},
+ {lemma:"μικρός", gloss:"малый (двоякие степени)", group:"grad", lvl:3, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["μικρός","μικρότερος|ἐλάττων","μικρότατος|ἐλάχιστος",null,null,null,null,null]},
+ {lemma:"ῥᾴδιος", gloss:"лёгкий", group:"grad", lvl:4, tense:"Gradus comparationis",
+  labels:["Positivus","Comparativus","Superlativus",null,null,null,null,null],
+  f:["ῥᾴδιος","ῥᾴων","ῥᾷστος",null,null,null,null,null]},
+];
+const ADJ_GROUPS = [
+  {id:"a12", label:"1–2 скл."},
+  {id:"a2", label:"Два окончания"},
+  {id:"a3", label:"III скл."},
+  {id:"irrA", label:"πᾶς, μέγας, πολύς"},
+  {id:"compD", label:"Склонение сравн."},
+  {id:"grad", label:"Степени сравнения"},
+];
+/* ── Основные формы глагола (ряды) — добавляются в VERBS ── */
+const PPARTS = [
+ ["λύω","развязывать",2, ["λύω","λύσω","ἔλυσα","λέλυκα","λέλυμαι","ἐλύθην"]],
+ ["παιδεύω","воспитывать",2, ["παιδεύω","παιδεύσω","ἐπαίδευσα","πεπαίδευκα","πεπαίδευμαι","ἐπαιδεύθην"]],
+ ["γράφω","писать",2, ["γράφω","γράψω","ἔγραψα","γέγραφα","γέγραμμαι","ἐγράφην"]],
+ ["πέμπω","посылать",3, ["πέμπω","πέμψω","ἔπεμψα","πέπομφα","πέπεμμαι","ἐπέμφθην"]],
+ ["λείπω","оставлять",3, ["λείπω","λείψω","ἔλιπον","λέλοιπα","λέλειμμαι","ἐλείφθην"]],
+ ["λαμβάνω","брать",3, ["λαμβάνω","λήψομαι","ἔλαβον","εἴληφα","εἴλημμαι","ἐλήφθην"]],
+ ["ἄγω","вести",3, ["ἄγω","ἄξω","ἤγαγον","ἦχα","ἦγμαι","ἤχθην"]],
+ ["βάλλω","бросать",3, ["βάλλω","βαλῶ","ἔβαλον","βέβληκα","βέβλημαι","ἐβλήθην"]],
+ ["φαίνω","показывать",3, ["φαίνω","φανῶ","ἔφηνα","πέφηνα|πέφαγκα","πέφασμαι","ἐφάνην|ἐφάνθην"]],
+ ["ἀγγέλλω","возвещать",3, ["ἀγγέλλω","ἀγγελῶ","ἤγγειλα","ἤγγελκα","ἤγγελμαι","ἠγγέλθην"]],
+ ["πείθω","убеждать",3, ["πείθω","πείσω","ἔπεισα","πέπεικα|πέποιθα","πέπεισμαι","ἐπείσθην"]],
+ ["ἀκούω","слышать",3, ["ἀκούω","ἀκούσομαι","ἤκουσα","ἀκήκοα",null,"ἠκούσθην"]],
+ ["γίγνομαι","становиться",3, ["γίγνομαι","γενήσομαι","ἐγενόμην","γέγονα","γεγένημαι",null]],
+ ["λέγω","говорить (супплет.)",4, ["λέγω","ἐρῶ|λέξω","εἶπον|ἔλεξα","εἴρηκα","εἴρημαι|λέλεγμαι","ἐρρήθην|ἐλέχθην"]],
+ ["ὁράω","видеть (супплет.)",4, ["ὁράω","ὄψομαι","εἶδον","ἑώρακα|ἑόρακα","ἑώραμαι|ὦμμαι","ὤφθην"]],
+ ["φέρω","нести (супплет.)",4, ["φέρω","οἴσω","ἤνεγκον|ἤνεγκα","ἐνήνοχα","ἐνήνεγμαι","ἠνέχθην"]],
+ ["ἔρχομαι","идти (супплет.)",4, ["ἔρχομαι","εἶμι|ἐλεύσομαι","ἦλθον","ἐλήλυθα",null,null]],
+ ["δίδωμι","давать",4, ["δίδωμι","δώσω","ἔδωκα","δέδωκα","δέδομαι","ἐδόθην"]],
+ ["τίθημι","класть",4, ["τίθημι","θήσω","ἔθηκα",null,null,"ἐτέθην"]],
+ ["ἵστημι","ставить / встать",4, ["ἵστημι","στήσω","ἔστησα|ἔστην","ἕστηκα",null,"ἐστάθην"]],
+];
+const PP_LABELS = ["Praes.","Fut.","Aor.","Perf. act.","Perf. med.-pass.","Aor. pass.",null,null];
+PPARTS.forEach(([lemma,gloss,lvl,forms])=>{
+  VERBS.push({lemma, gloss, group:"pparts", lvl, tense:"Основные формы",
+    labels: PP_LABELS.map((L,i)=> i<6 && forms[i]==null ? null : L),
+    f: [...forms, null, null]});
+});
+VERB_GROUPS.push({id:"pparts", label:"Основные формы"});
+
+/* Местоимения: 3-родовые — как прилагательные (без дуалиса);
+   личные ἐγώ/σύ — ряды с именованными слотами */
+const PRON = [
+ {lemma:"αὐτός, αὐτή, αὐτό", gloss:"сам; он (в косв. падежах)", group:"aut", lvl:2, tense:"Pron. (αὐτός)",
+  m:{sg:["αὐτός","αὐτοῦ","αὐτῷ","αὐτόν"], pl:["αὐτοί","αὐτῶν","αὐτοῖς","αὐτούς"]},
+  f:{sg:["αὐτή","αὐτῆς","αὐτῇ","αὐτήν"], pl:["αὐταί","αὐτῶν","αὐταῖς","αὐτάς"]},
+  n:{sg:["αὐτό","αὐτοῦ","αὐτῷ","αὐτό"], pl:["αὐτά","αὐτῶν","αὐτοῖς","αὐτά"]}},
+ {lemma:"οὗτος, αὕτη, τοῦτο", gloss:"этот (основы τουτ-/ταυτ-)", group:"dem", lvl:2, tense:"Pron. demonstrativum",
+  m:{sg:["οὗτος","τούτου","τούτῳ","τοῦτον"], pl:["οὗτοι","τούτων","τούτοις","τούτους"]},
+  f:{sg:["αὕτη","ταύτης","ταύτῃ","ταύτην"], pl:["αὗται","τούτων","ταύταις","ταύτας"]},
+  n:{sg:["τοῦτο","τούτου","τούτῳ","τοῦτο"], pl:["ταῦτα","τούτων","τούτοις","ταῦτα"]}},
+ {lemma:"ὅδε, ἥδε, τόδε", gloss:"вот этот (артикль + δε)", group:"dem", lvl:2, tense:"Pron. demonstrativum",
+  m:{sg:["ὅδε","τοῦδε","τῷδε","τόνδε"], pl:["οἵδε","τῶνδε","τοῖσδε","τούσδε"]},
+  f:{sg:["ἥδε","τῆσδε","τῇδε","τήνδε"], pl:["αἵδε","τῶνδε","ταῖσδε","τάσδε"]},
+  n:{sg:["τόδε","τοῦδε","τῷδε","τόδε"], pl:["τάδε","τῶνδε","τοῖσδε","τάδε"]}},
+ {lemma:"ἐκεῖνος, ἐκείνη, ἐκεῖνο", gloss:"тот", group:"dem", lvl:2, tense:"Pron. demonstrativum",
+  m:{sg:["ἐκεῖνος","ἐκείνου","ἐκείνῳ","ἐκεῖνον"], pl:["ἐκεῖνοι","ἐκείνων","ἐκείνοις","ἐκείνους"]},
+  f:{sg:["ἐκείνη","ἐκείνης","ἐκείνῃ","ἐκείνην"], pl:["ἐκεῖναι","ἐκείνων","ἐκείναις","ἐκείνας"]},
+  n:{sg:["ἐκεῖνο","ἐκείνου","ἐκείνῳ","ἐκεῖνο"], pl:["ἐκεῖνα","ἐκείνων","ἐκείνοις","ἐκεῖνα"]}},
+ {lemma:"ὅς, ἥ, ὅ", gloss:"который (относительное)", group:"rel", lvl:2, tense:"Pron. relativum",
+  m:{sg:["ὅς","οὗ","ᾧ","ὅν"], pl:["οἵ","ὧν","οἷς","οὕς"]},
+  f:{sg:["ἥ","ἧς","ᾗ","ἥν"], pl:["αἵ","ὧν","αἷς","ἅς"]},
+  n:{sg:["ὅ","οὗ","ᾧ","ὅ"], pl:["ἅ","ὧν","οἷς","ἅ"]}},
+ {lemma:"τίς, τί", gloss:"кто? что? (всегда с острым)", group:"int", lvl:3, tense:"Pron. interrogativum",
+  m:{sg:["τίς","τίνος|τοῦ","τίνι|τῷ","τίνα"], pl:["τίνες","τίνων","τίσι|τίσιν","τίνας"]},
+  f:{sg:["τίς","τίνος|τοῦ","τίνι|τῷ","τίνα"], pl:["τίνες","τίνων","τίσι|τίσιν","τίνας"]},
+  n:{sg:["τί","τίνος|τοῦ","τίνι|τῷ","τί"], pl:["τίνα","τίνων","τίσι|τίσιν","τίνα"]}},
+ {lemma:"τις, τι", gloss:"кто-то, некий (энклитика)", group:"int", lvl:3, tense:"Pron. indefinitum",
+  m:{sg:["τις","τινός|του","τινί|τῳ","τινά"], pl:["τινές","τινῶν","τισί|τισίν","τινάς"]},
+  f:{sg:["τις","τινός|του","τινί|τῳ","τινά"], pl:["τινές","τινῶν","τισί|τισίν","τινάς"]},
+  n:{sg:["τι","τινός|του","τινί|τῳ","τι"], pl:["τινά|ἄττα","τινῶν","τισί|τισίν","τινά|ἄττα"]}},
+ {lemma:"ἐγώ", gloss:"я (энклитические μου, μοι, με)", group:"pers", lvl:2, tense:"Pron. personale",
+  labels:["Nom. Sg.","Gen. Sg.","Dat. Sg.","Acc. Sg.","Nom. Pl.","Gen. Pl.","Dat. Pl.","Acc. Pl."],
+  f:["ἐγώ","ἐμοῦ|μου","ἐμοί|μοι","ἐμέ|με","ἡμεῖς","ἡμῶν","ἡμῖν","ἡμᾶς"]},
+ {lemma:"σύ", gloss:"ты (энклитические σου, σοι, σε)", group:"pers", lvl:2, tense:"Pron. personale",
+  labels:["Nom. Sg.","Gen. Sg.","Dat. Sg.","Acc. Sg.","Nom. Pl.","Gen. Pl.","Dat. Pl.","Acc. Pl."],
+  f:["σύ","σοῦ|σου","σοί|σοι","σέ|σε","ὑμεῖς","ὑμῶν","ὑμῖν","ὑμᾶς"]},
+];
+const PRON_GROUPS = [
+  {id:"dem", label:"Указательные"},
+  {id:"aut", label:"αὐτός"},
+  {id:"rel", label:"ὅς, ἥ, ὅ"},
+  {id:"int", label:"τίς / τις"},
+  {id:"pers", label:"Личные"},
+];
+/* Наречия и их степени — в раздел прилагательных */
+const ADV = [
+ ["σοφός","мудро",2, ["σοφῶς","σοφώτερον","σοφώτατα"]],
+ ["δίκαιος","справедливо",2, ["δικαίως","δικαιότερον","δικαιότατα"]],
+ ["ἀληθής","истинно",2, ["ἀληθῶς","ἀληθέστερον","ἀληθέστατα"]],
+ ["ἡδύς","приятно",3, ["ἡδέως","ἥδιον","ἥδιστα"]],
+ ["ταχύς","быстро",3, ["ταχέως","θᾶττον","τάχιστα"]],
+ ["καλός","прекрасно",3, ["καλῶς","κάλλιον","κάλλιστα"]],
+ ["ἀγαθός","хорошо (εὖ!)",3, ["εὖ","ἄμεινον|βέλτιον","ἄριστα|βέλτιστα"]],
+ ["μάλα","очень",3, ["μάλα","μᾶλλον","μάλιστα"]],
+];
+ADV.forEach(([lemma,gloss,lvl,forms])=>{
+  ADJ.push({lemma, gloss, group:"adv", lvl, tense:"Adverbium: степени",
+    labels:["Adverbium","Comparativus","Superlativus",null,null,null,null,null],
+    f:[...forms,null,null,null,null,null]});
+});
+ADJ_GROUPS.push({id:"adv", label:"Наречия"});
+
+/* Уровни сложности */
+const DIFF = [
+  {id:1, label:"I",   title:"начальный: verba pura, I–II склонения"},
+  {id:2, label:"II",  title:"основной: verba muta, contracta, III скл., aor. pass."},
+  {id:3, label:"III", title:"продвинутый: liquida, сильные времена, перфект"},
+  {id:4, label:"IV",  title:"второе спряжение, εἶμι, φημί, οἶδα, perf. med.-pass."},
+  {id:5, label:"Ω",   title:"режим кошмара: гомеровский диалект"},
+];
+const NOUN_LVL = {"χώρα":1,"τιμή":1,"λόγος":1,"ἄνθρωπος":1,"δῶρον":1,
+  "θάλαττα":2,"πολίτης":2,"νεανίας":2,"φύλαξ":2,"ἐλπίς":2,"σῶμα":2,
+  "γέρων":3,"γένος":3,"πόλις":3,"βασιλεύς":3,
+  "πόλεμος":5,"θεά":5};
+NOUNS.forEach(n=>{ n.lvl = n.lvl || NOUN_LVL[n.lemma] || 2; });
+const PTC_LVL = {pMP:2, pPraes:3, pAor:3, pAorP:3, pPerf:4};
+PTC.forEach(p=>{ p.lvl = PTC_LVL[p.group] || 3; });
+
+const CASES5 = ["Nom.","Gen.","Dat.","Acc.","Voc."];
+const CASES4 = ["Nom.","Gen.","Dat.","Acc."];
+const PERSONS = ["1 Sg.","2 Sg.","3 Sg.","2 Du.","3 Du.","1 Pl.","2 Pl.","3 Pl."];
+const DUAL_PERSON_IDX = [3,4];
+const GENDERS = {m:"Masc.", f:"Fem.", n:"Neut."};
+
+/* Слоты существительного: 0–4 sg, 5–9 pl, 10–11 du */
+const NOUN_SLOTS = [];
+["Sg.","Pl."].forEach((num,ni)=>CASES5.forEach((c,ci)=>
+  NOUN_SLOTS.push({key:ni?"pl":"sg", i:ci, dual:false, label:`${c} ${num}`})));
+NOUN_SLOTS.push({key:"du", i:0, dual:true, label:"Nom.-Acc.-Voc. Du."});
+NOUN_SLOTS.push({key:"du", i:1, dual:true, label:"Gen.-Dat. Du."});
+
+/* Слоты причастия (в пределах одного рода): 0–3 sg, 4–7 pl, 8–9 du */
+const PTC_SLOTS = [];
+["Sg.","Pl."].forEach((num,ni)=>CASES4.forEach((c,ci)=>
+  PTC_SLOTS.push({key:ni?"pl":"sg", i:ci, dual:false, label:`${c} ${num}`})));
+PTC_SLOTS.push({key:"du", i:0, dual:true, label:"Nom.-Acc. Du."});
+PTC_SLOTS.push({key:"du", i:1, dual:true, label:"Gen.-Dat. Du."});
+
+const LEVELS = [
+  {xp:0,    title:"μαθητής",      sub:"ученик"},
+  {xp:120,  title:"γραμματιστής", sub:"учитель грамоты"},
+  {xp:300,  title:"γραμματικός",  sub:"грамматик"},
+  {xp:600,  title:"ῥήτωρ",        sub:"ритор"},
+  {xp:1000, title:"σοφιστής",     sub:"софист"},
+  {xp:1600, title:"φιλόλογος",    sub:"филолог"},
+  {xp:2400, title:"διδάσκαλος",   sub:"наставник"},
+];
+
+/* ══════════════ СОСТОЯНИЕ ══════════════ */
+const S = {
+  section:"nouns",          // nouns | verbs | ptc
+  mode:"type",              // type | parse | paradigm
+  groups:{
+    nouns:new Set(NOUN_GROUPS.map(g=>g.id)),
+    verbs:new Set(VERB_GROUPS.map(g=>g.id)),
+    ptc:new Set(PTC_GROUPS.map(g=>g.id)),
+    adj:new Set(ADJ_GROUPS.map(g=>g.id)),
+    pron:new Set(PRON_GROUPS.map(g=>g.id)),
+  },
+  review:[], byGroup:{},
+  ach:{}, cnt:{strictRight:0, accentRight:0, perfectParadigms:0, sprintBest:0},
+  sprint:null,
+  strict:false, dual:true,
+  levels:new Set([1,2,3,4]),
+  xp:0, streak:0, best:0, right:0, total:0,
+  q:null, answered:false,
+};
+
+/* Каскад хранилищ: claude.ai artifact storage -> localStorage (свой сайт) -> память */
+const backend = {
+  async get(key){
+    try{ const r = await window.storage.get(key); if(r) return r; }catch(e){}
+    try{ const v = localStorage.getItem(key); if(v!=null) return {value:v}; }catch(e){}
+    return null;
+  },
+  async set(key, value){
+    try{ await window.storage.set(key, value); return; }catch(e){}
+    try{ localStorage.setItem(key, value); }catch(e){}
+  }
+};
+const store = {
+  async load(){
+    try{
+      const r = await backend.get("gymnasion-progress");
+      if(r && r.value){ const d = JSON.parse(r.value);
+        ["xp","best","right","total"].forEach(k=>{ if(typeof d[k]==="number") S[k]=d[k]; });
+        if(Array.isArray(d.review)) S.review = d.review.slice(0,60);
+        if(d.byGroup && typeof d.byGroup==="object") S.byGroup = d.byGroup;
+        if(d.ach && typeof d.ach==="object") S.ach = d.ach;
+        if(d.cnt && typeof d.cnt==="object") Object.assign(S.cnt, d.cnt); }
+    }catch(e){/* хранилища нет — работаем в памяти */}
+  },
+  async save(){
+    try{
+      const {xp,best,right,total,review,byGroup,ach,cnt} = S;
+      await backend.set("gymnasion-progress",
+        JSON.stringify({xp,best,right,total,review,byGroup,ach,cnt}));
+    }catch(e){}
+  }
+};
+
+/* ══════════════ НОРМАЛИЗАЦИЯ ══════════════ */
+function stripDia(s){
+  return s.normalize("NFD").replace(/[\u0300-\u036f\u0345]/g,"").normalize("NFC");
+}
+function canon(s, strict){
+  s = s.trim().replace(/\s+/g," ").normalize("NFC").replace(/ς/g,"σ").toLowerCase();
+  if(!strict) s = stripDia(s);
+  return s;
+}
+function matches(input, variants, strict){
+  const inp = canon(input, strict);
+  return variants.some(v => canon(v, strict) === inp);
+}
+
+/* ══════════════ ГЕНЕРАЦИЯ ВОПРОСОВ ══════════════ */
+const rnd = a => a[Math.floor(Math.random()*a.length)];
+function shuffle(a){
+  a = a.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+/* база XP: ввод дороже выбора */
+const XP_BASE = {type:12, choose:8, parse:10, quiz:8, accent:10};
+
+function srcOf(sec){ return sec==="nouns"?NOUNS : sec==="verbs"?VERBS : sec==="ptc"?PTC
+  : sec==="adj"?ADJ : PRON; }
+function pool(){
+  const set = S.groups[S.section];
+  const src = srcOf(S.section);
+  const byLvl = src.filter(x => S.levels.has(x.lvl));
+  const p = byLvl.filter(x => set.has(x.group));
+  /* мягкий откат: выбранные разделы без нужного уровня → любой уровень;
+     совсем пусто → весь раздел */
+  if(p.length) return p;
+  const byGroup = src.filter(x => set.has(x.group));
+  return byGroup.length ? byGroup : src;
+}
+function nounSlots(){ return NOUN_SLOTS.filter(s=>S.dual || !s.dual); }
+function ptcSlots(){ return PTC_SLOTS.filter(s=>S.dual || !s.dual); }
+function ptcSlotsFor(item){
+  return PTC_SLOTS.filter(s=>{
+    if(s.dual && !S.dual) return false;
+    if(s.key==="du" && !(item.m && item.m.du)) return false;
+    return true;
+  });
+}
+/* Слоты конкретного глагольного словоизменения:
+   null-формы пропускаются (императив без 1-го лица),
+   item.labels переопределяет подписи (инфинитивы) */
+function slotsOf(item){
+  const idx = [];
+  item.f.forEach((f,i)=>{
+    if(f==null) return;
+    if(!item.labels && !S.dual && DUAL_PERSON_IDX.includes(i)) return;
+    idx.push(i);
+  });
+  return idx;
+}
+function lbl(item,i){ return item.labels ? item.labels[i] : PERSONS[i]; }
+function verbIdx(){ return PERSONS.map((_,i)=>i).filter(i=>S.dual || !DUAL_PERSON_IDX.includes(i)); }
+
+function newQuestion(rerollDepth=0){
+  S.answered = false;
+  const rq = S.mode!=="paradigm" ? drawReview() : null;
+  if(rq && (S.mode!=="accent" || (rq.acc = accentAnalysis(rq.variants[0])))){
+    S.q = rq;
+    if(S.mode==="choose") buildFormOptions(S.q);
+    if(S.mode==="quiz") buildQuiz(S.q);
+    render(); return;
+  }
+  const item = rnd(pool());
+  if(S.mode==="paradigm"){
+    S.q = {kind:"paradigm", item};
+    if(!Array.isArray(item.f) && S.section!=="nouns") S.q.gender = rnd(["m","f","n"]);
+    render(); return;
+  }
+  if(S.section==="nouns"){
+    const slot = rnd(nounSlots());
+    S.q = {kind:"noun", item, slot, variants:item[slot.key][slot.i].split("|"), spec:slot.label};
+  }else if(Array.isArray(item.f)){
+    const pi = rnd(slotsOf(item));
+    S.q = {kind:"verb", item, pi, variants:item.f[pi].split("|"), spec:`${lbl(item,pi)} ${item.tense}`};
+  }else{
+    const g = rnd(["m","f","n"]);
+    const slot = rnd(ptcSlotsFor(item));
+    S.q = {kind:"ptc", item, g, slot,
+           variants:item[g][slot.key][slot.i].split("|"),
+           spec:`${slot.label} ${GENDERS[g]}`};
+  }
+  if(S.mode==="accent"){
+    S.q.acc = accentAnalysis(S.q.variants.find(v=>accentAnalysis(v)) || S.q.variants[0]);
+    if(!S.q.acc){
+      if(rerollDepth < 60){ newQuestion(rerollDepth+1); return; }
+      /* крайне маловероятно: всё без ударения — показываем как ввод */
+      S.q.acc = null; S.mode = "type"; syncModeButtons();
+    }
+  }
+  if(S.mode==="choose") buildFormOptions(S.q);
+  if(S.mode==="quiz") buildQuiz(S.q);
+  render();
+}
+
+/* ── Работа над ошибками ── */
+function reviewDesc(q){
+  return q.kind==="noun"
+    ? {k:"n", sec:S.section, lemma:q.item.lemma, grp:q.item.group, sk:q.slot.key, si:q.slot.i}
+    : q.kind==="verb"
+    ? {k:"v", sec:S.section, lemma:q.item.lemma, tense:q.item.tense, pi:q.pi}
+    : {k:"p", sec:S.section, lemma:q.item.lemma, tense:q.item.tense||"", g:q.g, sk:q.slot.key, si:q.slot.i};
+}
+function pushReview(){
+  const d = reviewDesc(S.q), key = JSON.stringify(d);
+  if(!S.review.some(x=>JSON.stringify(x)===key)) S.review.push(d);
+  if(S.review.length>60) S.review.shift();
+}
+function clearReview(q){
+  if(!q.isReview) return;
+  const key = JSON.stringify(q.desc);
+  S.review = S.review.filter(x=>JSON.stringify(x)!==key);
+}
+function drawReview(){
+  if(S.sprint) return null;
+  const cand = S.review.filter(d=>d.sec===S.section);
+  if(!cand.length || Math.random()>0.35) return null;
+  const d = rnd(cand);
+  const item = srcOf(d.sec).find(x=>x.lemma===d.lemma
+    && (d.k!=="n" || !d.grp || x.group===d.grp)
+    && (d.k==="n" || (x.tense||"")===(d.tense||"")));
+  if(!item) return null;
+  if(d.k==="n"){
+    if(d.sk==="du" && !S.dual) return null;
+    const slot = NOUN_SLOTS.find(s=>s.key===d.sk && s.i===d.si);
+    return {kind:"noun", item, slot, variants:item[d.sk][d.si].split("|"),
+            spec:slot.label, isReview:true, desc:d};
+  }
+  if(d.k==="v"){
+    if(item.f[d.pi]==null) return null;
+    if(!item.labels && !S.dual && DUAL_PERSON_IDX.includes(d.pi)) return null;
+    return {kind:"verb", item, pi:d.pi, variants:item.f[d.pi].split("|"),
+            spec:`${lbl(item,d.pi)} ${item.tense}`, isReview:true, desc:d};
+  }
+  if(d.sk==="du" && (!S.dual || !item[d.g].du)) return null;
+  const slot = PTC_SLOTS.find(s=>s.key===d.sk && s.i===d.si);
+  return {kind:"ptc", item, g:d.g, slot, variants:item[d.g][d.sk][d.si].split("|"),
+          spec:`${slot.label} ${GENDERS[d.g]}`, isReview:true, desc:d};
+}
+
+/* Анализ ударения: одна ударная гласная, тип острое/облечённое */
+function accentAnalysis(form){
+  const out = []; let idx = -1, type = null;
+  for(const ch of form.normalize("NFC")){
+    const d = ch.normalize("NFD");
+    const ac = d.includes("\u0301") || d.includes("\u0300");
+    const ci = d.includes("\u0342");
+    const bare = d.replace(/[\u0300\u0301\u0342]/g,"").normalize("NFC");
+    if(ac || ci){
+      if(idx !== -1) return null;      /* два ударения (описательные формы) — не годится */
+      idx = out.length; type = ci ? "ci" : "ac";
+    }
+    out.push(bare);
+  }
+  return idx === -1 ? null : {chars:out, idx, type};
+}
+const VOWELS = "αεηιουω";
+function isVowelChar(c){
+  const base = c.normalize("NFD").replace(/[\u0300-\u036f\u0345]/g,"");
+  return VOWELS.includes(base.toLowerCase());
+}
+
+/* Варианты форм для «Образование · выбор»: дистракторы из той же парадигмы */
+function buildFormOptions(q){
+  const correct = rnd(q.variants);
+  const seen = new Set(q.variants.map(v=>canon(v,false)));
+  const cand = [];
+  const push = f => f.split("|").forEach(v=>{
+    const c = canon(v,false);
+    if(!seen.has(c)){ seen.add(c); cand.push(v); }
+  });
+  if(q.kind==="noun") NOUN_SLOTS.forEach(s=>push(q.item[s.key][s.i]));
+  else if(q.kind==="verb") q.item.f.forEach(f=>{ if(f) push(f); });
+  else ["m","f","n"].forEach(g=>PTC_SLOTS.forEach(s=>{
+    if(s.key==="du" && !q.item[g].du) return;
+    push(q.item[g][s.key][s.i]);
+  }));
+  q.options = shuffle([correct, ...shuffle(cand).slice(0,4)]);
+}
+
+/* Варианты разборов для «Разбор · викторина» (у причастий — с родом) */
+function buildQuiz(q){
+  q.shown = rnd(q.variants);
+  const eq = (a,b)=> canon(a,false)===canon(b,false);
+  const hit = f => f.split("|").some(v=>q.variants.some(w=>eq(v,w)));
+  const all = [], valid = [];
+  if(q.kind==="noun"){
+    nounSlots().forEach(s=>{ all.push(s.label); if(hit(q.item[s.key][s.i])) valid.push(s.label); });
+  }else if(q.kind==="verb"){
+    slotsOf(q.item).forEach(pi=>{ const L=lbl(q.item,pi);
+      all.push(L); if(hit(q.item.f[pi])) valid.push(L); });
+  }else{
+    ["m","f","n"].forEach(g=>ptcSlotsFor(q.item).forEach(s=>{
+      const lab = `${s.label} ${GENDERS[g]}`;
+      all.push(lab);
+      if(hit(q.item[g][s.key][s.i])) valid.push(lab);
+    }));
+  }
+  q.validLabels = new Set(valid);
+  const distractors = shuffle(all.filter(l=>!q.validLabels.has(l))).slice(0,4);
+  q.optionLabels = shuffle([rnd(valid), ...distractors]);
+}
+
+/* Разбор: все верные слоты для показанной формы */
+function validParses(q){
+  const ok = new Set();
+  const eq = (a,b)=> canon(a,false)===canon(b,false);
+  const hit = f => f.split("|").some(v=>q.variants.some(w=>eq(v,w)));
+  if(q.kind==="noun"){
+    nounSlots().forEach((s,idx)=>{ if(hit(q.item[s.key][s.i])) ok.add(idx); });
+  }else if(q.kind==="verb"){
+    slotsOf(q.item).forEach((pi,idx)=>{ if(hit(q.item.f[pi])) ok.add(idx); });
+  }else{
+    /* по падежу-числу, род не спрашиваем (омонимия m/n) */
+    ptcSlotsFor(q.item).forEach((s,idx)=>{
+      if(["m","f","n"].some(g=>hit(q.item[g][s.key][s.i]))) ok.add(idx);
+    });
+  }
+  return ok;
+}
+/* Полный разбор причастия с родами — для пояснения после ответа */
+function ptcFullParse(q){
+  const eq = (a,b)=> canon(a,false)===canon(b,false);
+  const out = [];
+  ["m","f","n"].forEach(g=>{
+    ptcSlotsFor(q.item).forEach(s=>{
+      if(q.item[g][s.key][s.i].split("|").some(v=>q.variants.some(w=>eq(v,w))))
+        out.push(`${s.label} ${GENDERS[g]}`);
+    });
+  });
+  return out;
+}
+
+/* ══════════════ РЕНДЕР ══════════════ */
+const $ = id => document.getElementById(id);
+
+function levelFor(xp){ let li=0; LEVELS.forEach((l,i)=>{ if(xp>=l.xp) li=i; }); return li; }
+function renderStats(){
+  $("xpVal").textContent = S.xp;
+  $("streakVal").textContent = S.streak;
+  $("bestVal").textContent = S.best;
+  $("accVal").textContent = S.total ? Math.round(100*S.right/S.total)+"%" : "—";
+  const li = levelFor(S.xp);
+  $("levelTag").textContent = LEVELS[li].title;
+  const cur = LEVELS[li].xp, next = LEVELS[li+1] ? LEVELS[li+1].xp : cur+1;
+  $("xpFill").style.width = ((LEVELS[li+1] ? (S.xp-cur)/(next-cur) : 1)*100).toFixed(1)+"%";
+  const mult = 1 + Math.min(S.streak,10)*0.1;
+  $("comboLabel").textContent = S.streak>=2 ? `×${mult.toFixed(1)} за серию ${S.streak}` : "";
+  renderStatMap();
+}
+
+function renderStatMap(){
+  const box = $("statMap"); if(!box) return;
+  const secName = {nouns:"Скл.", verbs:"Спр.", ptc:"Прич.", adj:"Прил.", pron:"Мест."};
+  const allGroups = {nouns:NOUN_GROUPS, verbs:VERB_GROUPS, ptc:PTC_GROUPS, adj:ADJ_GROUPS, pron:PRON_GROUPS};
+  const rows = [];
+  Object.entries(allGroups).forEach(([sec,gs])=>gs.forEach(g=>{
+    const st = S.byGroup[sec+":"+g.id];
+    if(!st || !st.t) return;
+    const acc = st.r/st.t;
+    const col = acc>=0.8 ? "var(--laurel)" : acc>=0.5 ? "var(--gold)" : "var(--rubric)";
+    rows.push({acc, html:`<div class="sm-row"><span class="sm-name">${secName[sec]} · ${g.label}</span>
+      <span class="sm-bar"><i style="width:${Math.round(acc*100)}%; background:${col}"></i></span>
+      <span class="sm-num">${st.r}/${st.t}</span></div>`});
+  }));
+  rows.sort((a,b)=>a.acc-b.acc); /* слабые места сверху */
+  box.innerHTML = rows.length ? rows.map(r=>r.html).join("")
+    : '<p class="hint">Пока нет ответов — карта появится по мере занятий.</p>';
+}
+
+/* ── Экспорт и импорт прогресса ── */
+function wireProgressIO(){
+  $("expBtn").addEventListener("click", ()=>{
+    const {xp,best,right,total,review,byGroup,ach,cnt} = S;
+    const blob = new Blob([JSON.stringify({v:2,xp,best,right,total,review,byGroup,ach,cnt},null,1)],
+                          {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "gymnasion-progress.json";
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 500);
+  });
+  $("impBtn").addEventListener("click", ()=>$("impFile").click());
+  $("impFile").addEventListener("change", e=>{
+    const f = e.target.files[0]; if(!f) return;
+    f.text().then(t=>{
+      try{
+        const d = JSON.parse(t);
+        ["xp","best","right","total"].forEach(k=>{ if(typeof d[k]==="number") S[k]=d[k]; });
+        if(Array.isArray(d.review)) S.review = d.review.slice(0,60);
+        if(d.byGroup && typeof d.byGroup==="object") S.byGroup = d.byGroup;
+        if(d.ach && typeof d.ach==="object") S.ach = d.ach;
+        if(d.cnt && typeof d.cnt==="object") Object.assign(S.cnt, d.cnt);
+        store.save(); renderStats();
+      }catch(err){ alert("Не удалось прочитать файл прогресса"); }
+      e.target.value = "";
+    });
+  });
+}
+
+function greekKeyboard(){
+  const rows = ["αβγδεζηθ".split(""), "ικλμνξοπ".split(""), "ρσςτυφχψω".split("")];
+  const dia = [
+    ["\u0301","´ острое ударение"],["\u0300","` тяжёлое"],["\u0342","῀ облечённое"],
+    ["\u0313","᾿ тонкое придыхание"],["\u0314","῾ густое придыхание"],["\u0345","ι subscriptum"],
+  ];
+  let html = '<div class="kbd" aria-label="Греческая клавиатура">';
+  rows.forEach(r=>{
+    html += '<div class="kbd-row">' + r.map(ch =>
+      `<button type="button" class="key" data-ch="${ch}">${ch}</button>`).join("") + '</div>';
+  });
+  html += '<div class="kbd-row">' + dia.map(([c,t]) =>
+      `<button type="button" class="key dia" data-dia="${c}" title="${t}">${"◌"+c}</button>`).join("")
+      + '<button type="button" class="key util" data-act="sp">пробел</button>'
+      + '<button type="button" class="key util" data-act="bs">⌫ стереть</button></div>';
+  html += '</div><p class="kbd-note">Диакритика ставится на последнюю букву активного поля; знаки сочетаются (придыхание + ударение). При проверке σ и ς взаимозаменяемы.</p>';
+  return html;
+}
+
+let activeInput = null;
+function bindKeyboard(container){
+  container.querySelectorAll(".ginput").forEach(inp=>{
+    inp.addEventListener("focus", ()=>{ activeInput = inp; });
+  });
+  container.querySelectorAll(".key").forEach(k=>{
+    k.addEventListener("click", ()=>{
+      const inp = activeInput || container.querySelector(".ginput");
+      if(!inp || inp.disabled) return;
+      if(k.dataset.act==="bs"){ inp.value = [...inp.value].slice(0,-1).join(""); }
+      else if(k.dataset.act==="sp"){ inp.value += " "; }
+      else if(k.dataset.dia){ if(inp.value) inp.value = (inp.value + k.dataset.dia).normalize("NFC"); }
+      else inp.value += k.dataset.ch;
+      inp.focus();
+    });
+  });
+}
+
+function homBadge(it){
+  return it.group==="hom" ? ' <span class="hom-badge">Ω Ὅμηρος</span>' : "";
+}
+function lemmaBlock(q){
+  const it = q.item;
+  if(q.kind==="noun" || (q.kind==="paradigm" && S.section==="nouns")){
+    return `<div class="lemma"><span class="art">${it.art}</span> ${it.lemma}</div>
+            <div class="gloss">${it.gloss} · ${NOUN_GROUPS.find(g=>g.id===it.group).label}${homBadge(it)}</div>`;
+  }
+  if(Array.isArray(it.f)){
+    return `<div class="lemma">${it.lemma}</div>
+            <div class="gloss">${it.gloss} · ${it.tense}${homBadge(it)}</div>`;
+  }
+  return `<div class="lemma">${it.lemma}</div>
+          <div class="gloss">${it.gloss} · ${it.tense}${q.gender?` · <b>${GENDERS[q.gender]}</b>`:""}</div>`;
+}
+
+function render(){
+  const q = S.q;
+  const KIND = {type:"Образуйте форму", choose:"Выберите форму", parse:"Определите форму",
+                quiz:"Определите форму", accent:"Поставьте ударение", paradigm:"Заполните парадигму"};
+  $("taskKind").innerHTML = KIND[S.mode] + (q && q.isReview ? ' <span class="review-tag">↻ повторение</span>' : "");
+  let html = "";
+
+  if(S.mode==="type"){
+    html += lemmaBlock(q) + `<div class="target">→ ${q.spec}</div>
+      <div class="answer-row">
+        <input id="answer" class="ginput" autocomplete="off" autocapitalize="off" spellcheck="false"
+               placeholder="впишите форму…" aria-label="Ответ">
+        <button class="btn primary" id="checkBtn">Проверить</button>
+      </div>` + greekKeyboard();
+
+  }else if(S.mode==="choose"){
+    html += lemmaBlock(q) + `<div class="target">→ ${q.spec}</div>
+      <div class="parse-grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">`;
+    q.options.forEach((f,i)=>{
+      html += `<button class="parse-btn gk" data-i="${i}">${f}</button>`;
+    });
+    html += `</div>`;
+
+  }else if(S.mode==="parse"){
+    q.shown = rnd(q.variants);
+    if(q.kind==="noun"){
+      html += `<div class="gloss">${q.item.art} ${q.item.lemma} — ${q.item.gloss}${homBadge(q.item)}</div>
+               <div class="form-shown">${q.shown}</div><div class="parse-grid">`;
+      nounSlots().forEach((s,idx)=>{
+        html += `<button class="parse-btn ${s.dual?"wide":""}" data-idx="${idx}">${s.label}</button>`;
+      });
+      html += `</div>`;
+    }else if(q.kind==="verb"){
+      html += `<div class="gloss">${q.item.lemma} — ${q.item.gloss} · ${q.item.tense}</div>
+               <div class="form-shown">${q.shown}</div><div class="parse-grid p3">`;
+      slotsOf(q.item).forEach((pi,idx)=>{
+        html += `<button class="parse-btn" data-idx="${idx}">${lbl(q.item,pi)}</button>`;
+      });
+      html += `</div>`;
+    }else{
+      html += `<div class="gloss">${q.item.lemma} — ${q.item.gloss} · ${q.item.tense}</div>
+               <div class="form-shown">${q.shown}</div>
+               <div class="correction-note">род не спрашивается — только падеж и число</div>
+               <div class="parse-grid">`;
+      ptcSlotsFor(q.item).forEach((s,idx)=>{
+        html += `<button class="parse-btn ${s.dual?"wide":""}" data-idx="${idx}">${s.label}</button>`;
+      });
+      html += `</div>`;
+    }
+
+  }else if(S.mode==="quiz"){
+    const glossLine = (q.kind==="noun"
+      ? `${q.item.art} ${q.item.lemma} — ${q.item.gloss}`
+      : `${q.item.lemma} — ${q.item.gloss} · ${q.item.tense}`) + homBadge(q.item);
+    html += `<div class="gloss">${glossLine}</div>
+             <div class="form-shown">${q.shown}</div>
+             <div class="parse-grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">`;
+    q.optionLabels.forEach((lab,i)=>{
+      html += `<button class="parse-btn" data-i="${i}">${lab}</button>`;
+    });
+    html += `</div>`;
+
+  }else if(S.mode==="accent"){
+    html += lemmaBlock(q) + `<div class="target">→ ${q.spec}</div>
+      <div class="acc-form" id="accForm">` +
+      q.acc.chars.map((c,i)=> isVowelChar(c)
+        ? `<button class="acc-char" data-i="${i}">${c}</button>`
+        : `<span class="acc-char">${c}</span>`).join("") +
+      `</div>
+      <div class="acc-marks">
+        <button class="btn" id="accAc" disabled>´ острое</button>
+        <button class="btn" id="accCi" disabled>῀ облечённое</button>
+      </div>
+      <p class="kbd-note">Сначала выберите гласную, затем знак. Тяжёлое ударение не используется: формы даются вне фразы.</p>`;
+
+  }else{ /* paradigm */
+    html += lemmaBlock(q);
+    html += `<div class="pgrid" id="pgrid">`;
+    paradigmCells(q).forEach((c,i)=>{
+      if(c.sep) html += `<hr class="pgrid-sep">`;
+      html += `<label for="cell${i}">${c.label}</label>
+               <input id="cell${i}" class="ginput" data-cell="${i}" autocomplete="off" autocapitalize="off" spellcheck="false">`;
+    });
+    html += `</div>
+      <div class="next-row"><button class="btn primary" id="checkBtn">Проверить всё</button></div>`
+      + greekKeyboard();
+  }
+
+  $("taskArea").innerHTML = html;
+  $("feedback").innerHTML = "";
+  renderStats();
+
+  if(S.mode==="type"){
+    const inp = $("answer");
+    activeInput = inp; inp.focus();
+    $("checkBtn").addEventListener("click", checkTyped);
+    inp.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); S.answered ? newQuestion() : checkTyped(); } });
+    bindKeyboard($("taskArea"));
+  }else if(S.mode==="choose"){
+    $("taskArea").querySelectorAll(".parse-btn").forEach(b=>{
+      b.addEventListener("click", ()=>checkChoice(+b.dataset.i, b));
+    });
+  }else if(S.mode==="quiz"){
+    $("taskArea").querySelectorAll(".parse-btn").forEach(b=>{
+      b.addEventListener("click", ()=>checkQuiz(+b.dataset.i, b));
+    });
+  }else if(S.mode==="accent"){
+    let sel = -1;
+    $("taskArea").querySelectorAll("button.acc-char").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        if(S.answered) return;
+        $("taskArea").querySelectorAll("button.acc-char").forEach(x=>x.classList.remove("sel"));
+        b.classList.add("sel"); sel = +b.dataset.i;
+        $("accAc").disabled = $("accCi").disabled = false;
+      });
+    });
+    $("accAc").addEventListener("click", ()=>checkAccent(sel,"ac"));
+    $("accCi").addEventListener("click", ()=>checkAccent(sel,"ci"));
+  }else if(S.mode==="parse"){
+    $("taskArea").querySelectorAll(".parse-btn").forEach(b=>{
+      b.addEventListener("click", ()=>checkParse(+b.dataset.idx, b));
+    });
+  }else{
+    activeInput = $("cell0"); activeInput && activeInput.focus();
+    $("checkBtn").addEventListener("click", checkParadigm);
+    bindKeyboard($("taskArea"));
+    $("pgrid").addEventListener("keydown", e=>{
+      if(e.key==="Enter" && e.target.classList.contains("ginput")){
+        e.preventDefault();
+        const cells = [...document.querySelectorAll("#pgrid .ginput")];
+        const i = cells.indexOf(e.target);
+        if(i>=0 && i<cells.length-1) cells[i+1].focus(); else checkParadigm();
+      }
+    });
+  }
+}
+
+/* Ячейки полной парадигмы */
+function paradigmCells(q){
+  const cells = [];
+  if(S.section==="nouns"){
+    nounSlots().forEach(s=>{
+      cells.push({label:s.label, variants:q.item[s.key][s.i].split("|"),
+                  sep:(s.key==="pl"&&s.i===0)||(s.key==="du"&&s.i===0)});
+    });
+  }else if(Array.isArray(q.item.f)){
+    slotsOf(q.item).forEach(pi=>{
+      cells.push({label:lbl(q.item,pi), variants:q.item.f[pi].split("|"),
+                  sep: q.item.labels ? pi===4 && q.item.f[4]!=null : (pi===3||pi===5)});
+    });
+  }else{
+    ptcSlotsFor(q.item).forEach(s=>{
+      cells.push({label:s.label, variants:q.item[q.gender][s.key][s.i].split("|"),
+                  sep:(s.key==="pl"&&s.i===0)||(s.key==="du"&&s.i===0)});
+    });
+  }
+  return cells;
+}
+
+/* ══════════════ ПРОВЕРКА И НАЧИСЛЕНИЕ ══════════════ */
+function bumpLevel(before){
+  const after = levelFor(S.xp);
+  if(after>levelFor(before)) showLevelUp(after);
+}
+function showLevelUp(li){
+  $("lvTitle").textContent = LEVELS[li].title;
+  $("lvSub").textContent = "новый уровень — " + LEVELS[li].sub;
+  const el = $("levelup");
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 2600);
+}
+function bumpGroup(item, ok){
+  const k = S.section+":"+item.group;
+  const st = S.byGroup[k] || (S.byGroup[k] = {r:0,t:0});
+  st.t++; if(ok) st.r++;
+}
+function awardSingle(ok, base=10){
+  S.total++;
+  bumpGroup(S.q.item, ok);
+  if(ok) clearReview(S.q); else pushReview();
+  let gain = 0;
+  if(ok){
+    S.right++; S.streak++; S.best = Math.max(S.best, S.streak);
+    if(S.strict && (S.mode==="type"||S.mode==="paradigm")) S.cnt.strictRight++;
+    const mult = 1 + Math.min(S.streak-1,10)*0.1;
+    gain = Math.round(base*mult);
+    const before = S.xp; S.xp += gain; bumpLevel(before);
+  }else S.streak = 0;
+  store.save(); renderStats();
+  checkAchievements();
+  return gain;
+}
+
+function nextButton(){
+  return `<div class="next-row"><button class="btn" id="nextBtn">Далее ⏎</button></div>`;
+}
+function wireNext(){
+  $("nextBtn").addEventListener("click", newQuestion);
+  $("nextBtn").focus();
+}
+
+function checkTyped(){
+  if(S.answered) return;
+  const val = $("answer").value;
+  if(!val.trim()) return;
+  S.answered = true;
+  const ok = matches(val, S.q.variants, S.strict);
+  const gain = awardSingle(ok, XP_BASE.type);
+  const fb = $("feedback");
+  const noteLemma = S.q.kind==="noun" ? S.q.item.art+" "+S.q.item.lemma : S.q.item.lemma;
+  fb.innerHTML = (ok
+    ? `<div class="verdict ok">ὀρθῶς — верно <span class="xp-gain">+${gain} XP</span></div>`
+    : `<div class="verdict err">ἁμαρτία — ошибка</div>
+       <div class="correction">${S.q.variants.join(" / ")}</div>
+       <div class="correction-note"><span class="g">${noteLemma}</span>, ${S.q.spec}</div>`)
+    + nextButton();
+  wireNext();
+}
+
+function checkParse(idx, btn){
+  if(S.answered) return;
+  S.answered = true;
+  const valid = validParses(S.q);
+  const ok = valid.has(idx);
+  const gain = awardSingle(ok, XP_BASE.parse);
+  document.querySelectorAll(".parse-btn").forEach(b=>{
+    b.disabled = true;
+    if(valid.has(+b.dataset.idx)) b.classList.add("good");
+  });
+  if(!ok) btn.classList.add("bad");
+  let labels;
+  if(S.q.kind==="ptc"){
+    labels = ptcFullParse(S.q).join("; ");
+  }else{
+    const slots = S.q.kind==="noun" ? nounSlots()
+      : slotsOf(S.q.item).map(pi=>({label:lbl(S.q.item,pi)}));
+    labels = [...valid].map(i=>slots[i].label).join("; ");
+  }
+  $("feedback").innerHTML = (ok
+    ? `<div class="verdict ok">ὀρθῶς — верно <span class="xp-gain">+${gain} XP</span></div>`
+    : `<div class="verdict err">ἁμαρτία — ошибка</div>`)
+    + `<div class="correction-note"><span class="g">${S.q.shown}</span> — ${labels}</div>`
+    + nextButton();
+  wireNext();
+}
+
+/* Режим «Ударение» */
+function checkAccent(sel, type){
+  if(S.answered || sel<0) return;
+  S.answered = true;
+  const ok = sel===S.q.acc.idx && type===S.q.acc.type;
+  if(ok) S.cnt.accentRight++;
+  const gain = awardSingle(ok, XP_BASE.accent);
+  const trueForm = S.q.variants[0];
+  $("accAc").disabled = $("accCi").disabled = true;
+  $("accForm").outerHTML = `<div class="acc-result ${ok?"hit":"miss"}">
+    <span class="${ok?"hit":"miss"}">${trueForm}</span></div>`;
+  const typeName = S.q.acc.type==="ci" ? "облечённое" : "острое";
+  $("feedback").innerHTML = (ok
+    ? `<div class="verdict ok">ὀρθῶς — верно <span class="xp-gain">+${gain} XP</span></div>`
+    : `<div class="verdict err">ἁμαρτία — ошибка</div>
+       <div class="correction-note">верно: ${typeName} ударение — <span class="g">${trueForm}</span>, ${S.q.spec}</div>`)
+    + nextButton();
+  wireNext();
+  checkAchievements();
+}
+
+/* «Образование · выбор»: клик по греческой форме */
+function checkChoice(i, btn){
+  if(S.answered) return;
+  S.answered = true;
+  const ok = matches(S.q.options[i], S.q.variants, false);
+  if(S.sprint){
+    if(ok){ S.sprint.score++; S.sprint.endsAt += 2000; }
+    awardSingle(ok, XP_BASE.choose);
+    document.querySelectorAll(".parse-btn").forEach(b=>{
+      b.disabled = true;
+      if(matches(S.q.options[+b.dataset.i], S.q.variants, false)) b.classList.add("good");
+    });
+    if(!ok) btn.classList.add("bad");
+    setTimeout(()=>{ if(S.sprint) newQuestion(); }, 550);
+    return;
+  }
+  const gain = awardSingle(ok, XP_BASE.choose);
+  document.querySelectorAll(".parse-btn").forEach(b=>{
+    b.disabled = true;
+    if(matches(S.q.options[+b.dataset.i], S.q.variants, false)) b.classList.add("good");
+  });
+  if(!ok) btn.classList.add("bad");
+  const noteLemma = S.q.kind==="noun" ? S.q.item.art+" "+S.q.item.lemma : S.q.item.lemma;
+  $("feedback").innerHTML = (ok
+    ? `<div class="verdict ok">ὀρθῶς — верно <span class="xp-gain">+${gain} XP</span></div>`
+    : `<div class="verdict err">ἁμαρτία — ошибка</div>
+       <div class="correction">${S.q.variants.join(" / ")}</div>`)
+    + `<div class="correction-note"><span class="g">${noteLemma}</span>, ${S.q.spec}</div>`
+    + nextButton();
+  wireNext();
+}
+
+/* «Разбор · викторина»: один верный разбор из пяти */
+function checkQuiz(i, btn){
+  if(S.answered) return;
+  S.answered = true;
+  const ok = S.q.validLabels.has(S.q.optionLabels[i]);
+  const gain = awardSingle(ok, XP_BASE.quiz);
+  document.querySelectorAll(".parse-btn").forEach(b=>{
+    b.disabled = true;
+    if(S.q.validLabels.has(S.q.optionLabels[+b.dataset.i])) b.classList.add("good");
+  });
+  if(!ok) btn.classList.add("bad");
+  const full = S.q.kind==="ptc" ? ptcFullParse(S.q) : [...S.q.validLabels];
+  $("feedback").innerHTML = (ok
+    ? `<div class="verdict ok">ὀρθῶς — верно <span class="xp-gain">+${gain} XP</span></div>`
+    : `<div class="verdict err">ἁμαρτία — ошибка</div>`)
+    + `<div class="correction-note"><span class="g">${S.q.shown}</span> — ${full.join("; ")}</div>`
+    + nextButton();
+  wireNext();
+}
+
+function checkParadigm(){
+  if(S.answered) return;
+  S.answered = true;
+  const cells = paradigmCells(S.q);
+  const inputs = [...document.querySelectorAll("#pgrid .ginput")];
+  let good = 0;
+  inputs.forEach((inp,i)=>{
+    const ok = matches(inp.value, cells[i].variants, S.strict);
+    inp.disabled = true;
+    inp.classList.add(ok ? "cell-ok" : "cell-bad");
+    S.total++;
+    bumpGroup(S.q.item, ok);
+    if(ok){ S.right++; good++; S.xp += 4; }
+    else{
+      const note = document.createElement("div");
+      note.className = "cell-note";
+      note.textContent = cells[i].variants.join(" / ");
+      inp.after(note);
+    }
+  });
+  const before = S.xp - good*4;
+  const all = good===cells.length;
+  let bonus = 0;
+  if(all){
+    S.streak++; S.best = Math.max(S.best, S.streak);
+    S.cnt.perfectParadigms++;
+    if(S.strict) S.cnt.strictRight += cells.length;
+    bonus = Math.round(20*(1 + Math.min(S.streak-1,10)*0.1));
+    S.xp += bonus;
+  }else S.streak = 0;
+  bumpLevel(before);
+  store.save(); renderStats();
+  checkAchievements();
+  $("feedback").innerHTML = (all
+    ? `<div class="verdict ok">ὀρθῶς — вся парадигма верна <span class="xp-gain">+${good*4 + bonus} XP (бонус ${bonus})</span></div>`
+    : `<div class="verdict mixed">верно ${good} из ${cells.length} <span class="xp-gain">+${good*4} XP</span></div>
+       <div class="correction-note">исправления — красным под ячейками</div>`)
+    + nextButton();
+  wireNext();
+}
+
+document.addEventListener("keydown", e=>{
+  if(e.key==="Enter" && S.answered && e.target.tagName!=="BUTTON" && !e.target.classList.contains("ginput"))
+    newQuestion();
+});
+
+/* ══════════════ СПРИНТ ══════════════ */
+function startSprint(){
+  if(S.sprint) return;
+  S.sprint = {score:0, endsAt:Date.now()+60000, prevMode:S.mode, timer:null};
+  S.mode = "choose";
+  syncModeButtons();
+  S.sprint.timer = setInterval(()=>{
+    const left = S.sprint.endsAt - Date.now();
+    if(left<=0){ stopSprint(true); return; }
+    $("comboLabel").textContent = `⏱ ${(left/1000).toFixed(1)} c · счёт ${S.sprint.score}`;
+  }, 100);
+  $("sprintBtn").textContent = "■ Остановить спринт";
+  newQuestion();
+}
+function stopSprint(finished){
+  if(!S.sprint) return;
+  clearInterval(S.sprint.timer);
+  const {score, prevMode} = S.sprint;
+  S.sprint = null;
+  S.mode = prevMode;
+  syncModeButtons();
+  $("sprintBtn").textContent = "⏱ Спринт — 60 секунд";
+  if(finished){
+    if(score > S.cnt.sprintBest) S.cnt.sprintBest = score;
+    store.save();
+    $("lvlTitle").textContent = `δρόμος: ${score}`;
+    $("lvlSub").textContent = score>=S.cnt.sprintBest && score>0
+      ? "спринт окончен — новый рекорд!" : `спринт окончен · рекорд ${S.cnt.sprintBest}`;
+    const el = $("levelup");
+    el.classList.add("show");
+    setTimeout(()=>el.classList.remove("show"), 2800);
+    checkAchievements();
+  }
+  renderSprintHint();
+  newQuestion();
+}
+function renderSprintHint(){
+  $("sprintBestHint").textContent = S.cnt.sprintBest
+    ? `Рекорд: ${S.cnt.sprintBest}. Верный ответ даёт +2 секунды.`
+    : "Быстрый выбор форм на время; верный ответ даёт +2 секунды.";
+}
+function syncModeButtons(){
+  document.querySelectorAll(".mode").forEach(x=>x.classList.toggle("on", x.dataset.mode===S.mode));
+}
+
+/* ══════════════ ДОСТИЖЕНИЯ ══════════════ */
+const ACH = [
+ {id:"first", ic:"α", t:"Ἀρχή", d:"Первый ответ", test:()=>S.total>=1},
+ {id:"r100", ic:"ρ", t:"Ἑκατόν", d:"100 верных ответов", test:()=>S.right>=100},
+ {id:"r1000", ic:"χ", t:"Χίλιοι", d:"1000 верных ответов", test:()=>S.right>=1000},
+ {id:"s10", ic:"ι", t:"Δεκάς", d:"Серия из 10 подряд", test:()=>S.best>=10},
+ {id:"s25", ic:"σ", t:"Στέφανος", d:"Серия из 25 подряд", test:()=>S.best>=25},
+ {id:"rhetor", ic:"ῥ", t:"Ῥήτωρ", d:"Достигнут уровень ῥήτωρ", test:()=>S.xp>=600},
+ {id:"didask", ic:"δ", t:"Διδάσκαλος", d:"Достигнут высший уровень", test:()=>S.xp>=2400},
+ {id:"acc90", ic:"κ", t:"Ἀκρίβεια", d:"Точность ≥ 90% при 100+ ответах", test:()=>S.total>=100 && S.right/S.total>=0.9},
+ {id:"poly", ic:"π", t:"Πολυμαθής", d:"Ответы во всех пяти разделах",
+  test:()=>["nouns","verbs","ptc","adj","pron"].every(s=>Object.keys(S.byGroup).some(k=>k.startsWith(s+":")))},
+ {id:"homer", ic:"Ω", t:"Ὁμηρίδης", d:"25 верных гомеровских форм",
+  test:()=>{ let r=0; Object.entries(S.byGroup).forEach(([k,v])=>{ if(k.endsWith(":hom")) r+=v.r; }); return r>=25; }},
+ {id:"sprint15", ic:"θ", t:"Δρομεύς", d:"15+ очков в спринте", test:()=>S.cnt.sprintBest>=15},
+ {id:"tonos", ic:"´", t:"Ὀξύτονος", d:"25 верных ударений", test:()=>S.cnt.accentRight>=25},
+ {id:"strict50", ic:"ϙ", t:"Ἀκριβολόγος", d:"50 верных в строгом режиме", test:()=>S.cnt.strictRight>=50},
+ {id:"teleios", ic:"τ", t:"Τέλειος", d:"10 безошибочных полных парадигм", test:()=>S.cnt.perfectParadigms>=10},
+];
+let achQueue = [];
+function checkAchievements(){
+  ACH.forEach(a=>{
+    if(S.ach[a.id]) return;
+    let got=false; try{ got = a.test(); }catch(e){}
+    if(got){ S.ach[a.id]=1; achQueue.push(a); }
+  });
+  if(achQueue.length) { store.save(); renderAch(); showNextAch(); }
+}
+let achShowing=false;
+function showNextAch(){
+  if(achShowing || !achQueue.length) return;
+  achShowing = true;
+  const a = achQueue.shift();
+  $("lvlTitle").textContent = a.ic+" "+a.t;
+  $("lvlSub").textContent = "достижение: "+a.d;
+  const el = $("levelup");
+  el.classList.add("show");
+  setTimeout(()=>{ el.classList.remove("show"); achShowing=false; showNextAch(); }, 2400);
+}
+function renderAch(){
+  const box=$("achGrid"); if(!box) return;
+  box.innerHTML = ACH.map(a=>`<div class="ach ${S.ach[a.id]?"got":""}">
+    <span class="ach-ic">${a.ic}</span>
+    <span><div class="ach-t">${a.t}</div><div class="ach-d">${a.d}</div></span></div>`).join("");
+}
+
+/* ══════════════ ПАНЕЛЬ УПРАВЛЕНИЯ ══════════════ */
+function renderLevels(){
+  $("lvlBox").innerHTML = DIFF.map(d =>
+    `<button class="chip ${S.levels.has(d.id)?"on":""}" data-l="${d.id}" title="${d.title}"
+             aria-pressed="${S.levels.has(d.id)}">${d.label}</button>`).join("");
+  $("lvlBox").querySelectorAll(".chip").forEach(c=>{
+    c.addEventListener("click", ()=>{
+      const id = +c.dataset.l;
+      if(S.levels.has(id)){ if(S.levels.size>1) S.levels.delete(id); } else S.levels.add(id);
+      renderLevels(); newQuestion();
+    });
+  });
+  const on = [...S.levels].sort();
+  $("lvlHint").textContent = on.length===4 ? "Все уровни — от verba pura до глаголов на -μι."
+    : DIFF.filter(d=>S.levels.has(d.id)).map(d=>`${d.label} — ${d.title.split(":")[1].trim()}`).join("; ");
+}
+
+function renderChips(){
+  const groups = S.section==="nouns" ? NOUN_GROUPS : S.section==="verbs" ? VERB_GROUPS
+    : S.section==="ptc" ? PTC_GROUPS : S.section==="adj" ? ADJ_GROUPS : PRON_GROUPS;
+  const set = S.groups[S.section];
+  $("chipBox").innerHTML = groups.map(g =>
+    `<button class="chip ${set.has(g.id)?"on":""}" data-g="${g.id}" aria-pressed="${set.has(g.id)}">${g.label}</button>`).join("");
+  $("chipBox").querySelectorAll(".chip").forEach(c=>{
+    c.addEventListener("click", ()=>{
+      const id = c.dataset.g;
+      if(set.has(id)){ if(set.size>1) set.delete(id); } else set.add(id);
+      renderChips(); newQuestion();
+    });
+  });
+}
+
+document.querySelectorAll(".tabs button").forEach(t=>{
+  t.addEventListener("click", ()=>{
+    if(S.sprint) stopSprint(false);
+    S.section = t.dataset.sec;
+    document.querySelectorAll(".tabs button").forEach(x=>{
+      x.classList.toggle("on", x===t);
+      x.setAttribute("aria-selected", x===t);
+    });
+    renderChips(); newQuestion();
+  });
+});
+
+document.querySelectorAll(".mode").forEach(m=>{
+  m.addEventListener("click", ()=>{
+    if(S.sprint) stopSprint(false);
+    document.querySelectorAll(".mode").forEach(x=>x.classList.remove("on"));
+    m.classList.add("on");
+    S.mode = m.dataset.mode;
+    newQuestion();
+  });
+});
+$("sprintBtn").addEventListener("click", ()=>{ S.sprint ? stopSprint(false) : startSprint(); });
+
+$("strictDia").addEventListener("change", e=>{ S.strict = e.target.checked; });
+$("dualOn").addEventListener("change", e=>{ S.dual = e.target.checked; newQuestion(); });
+
+/* ══════════════ СПРАВОЧНИК ══════════════ */
+function renderRef(){
+  const v = f => f.replace(/\|/g," / ");
+  const nounTables = NOUNS.map(it=>{
+    let rows = "";
+    nounSlotsAll().forEach(s=>{
+      rows += `<tr><td>${s.label}</td><td>${v(it[s.key][s.i])}</td></tr>`;
+    });
+    return `<div class="ref-table">
+      <h3>${it.art} ${it.lemma}</h3>
+      <div class="rt-sub">${it.gloss} · ${NOUN_GROUPS.find(g=>g.id===it.group).label}</div>
+      <table>${rows}</table></div>`;
+  }).join("");
+  const verbTables = VERBS.map(it=>`
+    <div class="ref-table">
+      <h3>${it.lemma}</h3>
+      <div class="rt-sub">${it.gloss} · ${it.tense}</div>
+      <table>${it.f.map((f,pi)=>f==null?"":`<tr><td>${lbl(it,pi)}</td><td>${v(f)}</td></tr>`).join("")}</table>
+    </div>`).join("");
+  const ptcTables = PTC.map(it=>{
+    let rows = `<tr><th></th><th>Masc.</th><th>Fem.</th><th>Neut.</th></tr>`;
+    PTC_SLOTS.forEach(s=>{
+      rows += `<tr><td>${s.label}</td>` +
+        ["m","f","n"].map(g=>`<td>${v(it[g][s.key][s.i])}</td>`).join("") + `</tr>`;
+    });
+    return `<div class="ref-table wide3">
+      <h3>${it.lemma}</h3>
+      <div class="rt-sub">${it.gloss} · ${it.tense} (${it.base})</div>
+      <table>${rows}</table></div>`;
+  }).join("");
+  const g3Table = it => {
+    let rows = `<tr><th></th><th>Masc.</th><th>Fem.</th><th>Neut.</th></tr>`;
+    PTC_SLOTS.forEach(s=>{
+      if(s.key==="du" && !(it.m && it.m.du)) return;
+      rows += `<tr><td>${s.label}</td>` +
+        ["m","f","n"].map(g=>`<td>${v(it[g][s.key][s.i])}</td>`).join("") + `</tr>`;
+    });
+    return `<div class="ref-table wide3">
+      <h3>${it.lemma}</h3>
+      <div class="rt-sub">${it.gloss} · ${it.tense}</div>
+      <table>${rows}</table></div>`;
+  };
+  const adjTables = ADJ.map(it=>{
+    if(Array.isArray(it.f)) return `<div class="ref-table">
+      <h3>${it.lemma}</h3>
+      <div class="rt-sub">${it.gloss}</div>
+      <table>${it.f.map((f,i)=>f==null?"":`<tr><td>${lbl(it,i)}</td><td>${v(f)}</td></tr>`).join("")}</table>
+    </div>`;
+    return g3Table(it);
+  }).join("");
+  const pronTables = PRON.map(it=>{
+    if(Array.isArray(it.f)) return `<div class="ref-table">
+      <h3>${it.lemma}</h3>
+      <div class="rt-sub">${it.gloss} · ${it.tense}</div>
+      <table>${it.f.map((f,i)=>f==null?"":`<tr><td>${lbl(it,i)}</td><td>${v(f)}</td></tr>`).join("")}</table>
+    </div>`;
+    return g3Table(it);
+  }).join("");
+  $("refBody").innerHTML = nounTables + verbTables + ptcTables + adjTables + pronTables;
+}
+function nounSlotsAll(){ return NOUN_SLOTS; }
+
+/* ══════════════ ЗАПУСК ══════════════ */
+(async function init(){
+  await store.load();
+  renderChips();
+  renderLevels();
+  renderRef();
+  wireProgressIO();
+  renderAch();
+  renderSprintHint();
+  newQuestion();
+})();
+</script>
+</body>
+</html>
